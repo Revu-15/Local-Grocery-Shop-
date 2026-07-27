@@ -156,34 +156,6 @@ export default function UserAuthModal({ isOpen, onClose, user, onSaveUser, onSig
       zIndex: 1000,
       padding: '20px'
     }}>
-      {/* Floating SMS Notification Popup Toast */}
-      {signUpStep === 'OTP' && generatedOtp && (
-        <div style={{
-          position: 'fixed',
-          top: '20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          zIndex: 9999,
-          backgroundColor: '#0f172a',
-          color: '#fff',
-          padding: '14px 20px',
-          borderRadius: '16px',
-          boxShadow: '0 20px 25px -5px rgba(0,0,0,0.4)',
-          border: '2px solid #10b981',
-          maxWidth: '440px',
-          width: '90%'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-            <div style={{ fontSize: '11px', fontWeight: '800', color: '#34d399', textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              💬 SIMULATED SMS & EMAIL NOTIFICATION
-            </div>
-            <span style={{ fontSize: '10px', color: '#94a3b8' }}>+91 {signUpData.phone}</span>
-          </div>
-          <div style={{ fontSize: '13px', fontWeight: '700', color: '#f8fafc', lineHeight: '1.4' }}>
-            Your FreshBasket verification OTP code is <span style={{ color: '#34d399', fontSize: '16px', fontWeight: '900', fontFamily: 'monospace', backgroundColor: '#064e3b', padding: '2px 8px', borderRadius: '6px' }}>{generatedOtp}</span>. Do not share it.
-          </div>
-        </div>
-      )}
 
       <div className="glass-card animate-fade-in" style={{
         width: '100%',
@@ -471,29 +443,28 @@ export default function UserAuthModal({ isOpen, onClose, user, onSaveUser, onSig
           ) : (
             /* OTP VERIFICATION STEP */
             <form onSubmit={handleVerifyOtp} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', textAlign: 'center' }}>
-              <div style={{ backgroundColor: '#ecfdf5', border: '1.5px solid #a7f3d0', padding: '14px', borderRadius: '14px' }}>
-                <div style={{ fontSize: '13px', fontWeight: '800', color: '#047857', marginBottom: '4px' }}>
-                  📲 SMS & Email OTP Sent!
+              <div style={{ backgroundColor: '#ecfdf5', border: '1.5px solid #a7f3d0', padding: '16px', borderRadius: '14px', textAlign: 'center' }}>
+                <div style={{ fontSize: '14px', fontWeight: '800', color: '#047857', marginBottom: '6px' }}>
+                  📲 OTP Sent to Your Mobile & Email!
                 </div>
-                <div style={{ fontSize: '12px', color: '#065f46' }}>
-                  Verification code sent to <strong>+91 {signUpData.phone}</strong> & <strong>{signUpData.email}</strong>.
-                </div>
-                <div style={{ marginTop: '8px', fontSize: '14px', fontWeight: '900', color: '#047857', backgroundColor: '#fff', padding: '6px 12px', borderRadius: '8px', border: '1px solid #6ee7b7', display: 'inline-block', fontFamily: 'monospace' }}>
-                  Your Verification OTP Code: <span style={{ fontSize: '18px', letterSpacing: '3px' }}>{generatedOtp}</span>
+                <div style={{ fontSize: '12px', color: '#065f46', lineHeight: '1.5' }}>
+                  6-digit verification code dispatched to <strong>+91 {signUpData.phone}</strong> & <strong>{signUpData.email}</strong>.
+                  <br />
+                  Please check your mobile phone SMS and email inbox to enter the code below.
                 </div>
               </div>
 
               <div>
                 <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#475569', marginBottom: '6px' }}>
-                  Enter 4-Digit OTP Code *
+                  Enter 6-Digit Verification OTP Code *
                 </label>
                 <input
                   type="text"
                   required
-                  maxLength={4}
-                  placeholder="Enter 4-digit OTP"
+                  maxLength={6}
+                  placeholder="Enter 6-digit OTP"
                   value={userEnteredOtp}
-                  onChange={(e) => setUserEnteredOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                  onChange={(e) => setUserEnteredOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '2px solid #059669', fontSize: '20px', fontWeight: '900', textAlign: 'center', letterSpacing: '6px', fontFamily: 'monospace', outline: 'none' }}
                 />
               </div>
