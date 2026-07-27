@@ -2,6 +2,8 @@
 
 A full-stack web application built for a **Local Grocery Shop** to manage inventory, stock alerts, customer orders, real-time stock deduction, billing receipts, and store analytics.
 
+**GitHub Repository**: [https://github.com/Revu-15/Local-Grocery-Shop-](https://github.com/Revu-15/Local-Grocery-Shop-)
+
 ---
 
 ## 🌟 Features & Highlights
