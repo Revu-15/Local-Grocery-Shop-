@@ -35,7 +35,7 @@ await initDatabase();
 // ----------------------------------------------------
 
 // Get all products (with category, search, low-stock filtering)
-app.get('/api/products', async (req, res) => {
+app.get(['/api/products', '/products'], async (req, res) => {
   try {
     const { category, search, low_stock } = req.query;
     let sql = 'SELECT * FROM products WHERE 1=1';
