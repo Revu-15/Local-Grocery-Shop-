@@ -10,7 +10,8 @@ import {
   Boxes,
   ClipboardList,
   History,
-  Sparkles
+  Sparkles,
+  Github
 } from 'lucide-react';
 
 export default function Navbar({
@@ -219,6 +220,19 @@ export default function Navbar({
               <PackageCheck size={14} /> Admin
             </button>
           </div>
+
+          {/* GitHub Repository Link */}
+          <a
+            href="https://github.com/Revu-15/Local-Grocery-Shop-"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-secondary"
+            style={{ padding: '8px 12px', fontSize: '13px' }}
+            title="View Code on GitHub"
+          >
+            <Github size={16} />
+            <span>GitHub</span>
+          </a>
         </div>
       </div>
     </header>
