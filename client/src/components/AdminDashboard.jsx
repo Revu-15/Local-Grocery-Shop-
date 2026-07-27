@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { fetchSalesReport, resetSeedData } from '../utils/api';
-import { DollarSign, ShoppingBag, AlertTriangle, XCircle, TrendingUp, RefreshCw, Layers } from 'lucide-react';
+import { fetchSalesReport, resetSeedData, fetchOrders, updateOrderStatus, updateOrderPaymentStatus } from '../utils/api';
+import { DollarSign, ShoppingBag, AlertTriangle, XCircle, TrendingUp, RefreshCw, Layers, CheckCircle2, ShieldAlert } from 'lucide-react';
 
 export default function AdminDashboard({ onNavigateToInventory }) {
   const [report, setReport] = useState(null);
+  const [pendingOrders, setPendingOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [resetting, setResetting] = useState(false);
 
@@ -14,12 +15,39 @@ export default function AdminDashboard({ onNavigateToInventory }) {
   const loadReport = async () => {
     try {
       setLoading(true);
-      const data = await fetchSalesReport();
-      setReport(data);
+      const [salesData, ordersData] = await Promise.all([
+        fetchSalesReport(),
+        fetchOrders()
+      ]);
+      setReport(salesData);
+      setPendingOrders(ordersData.filter((o) => o.payment_status !== 'Paid' && o.status !== 'Cancelled'));
     } catch (err) {
       console.error('Failed to load sales report:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleConfirmPayment = async (orderId) => {
+    try {
+      await updateOrderPaymentStatus(orderId, 'Paid');
+      await updateOrderStatus(orderId, 'Processing');
+      await loadReport();
+      alert('✓ UTR Payment Matched & Confirmed! Order status set to Processing.');
+    } catch (err) {
+      alert('Failed to confirm payment: ' + err.message);
+    }
+  };
+
+  const handleRejectPayment = async (orderId) => {
+    if (!window.confirm('Reject this unverified UTR / order and cancel order?')) return;
+    try {
+      await updateOrderPaymentStatus(orderId, 'Rejected (Fake UTR)');
+      await updateOrderStatus(orderId, 'Cancelled');
+      await loadReport();
+      alert('❌ UTR Rejected! Order cancelled and product inventory restored.');
+    } catch (err) {
+      alert('Failed to reject order: ' + err.message);
     }
   };
 
@@ -63,6 +91,51 @@ export default function AdminDashboard({ onNavigateToInventory }) {
           </button>
         </div>
       </div>
+
+      {/* PENDING BANK UTR VERIFICATION ALERT CARD */}
+      {pendingOrders.length > 0 && (
+        <div style={{ backgroundColor: '#fffbe6', border: '2px solid #fde047', padding: '20px', borderRadius: '16px', marginBottom: '28px', boxShadow: '0 4px 12px rgba(234,179,8,0.15)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+            <div style={{ fontSize: '16px', fontWeight: '800', color: '#854d0e', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <ShieldAlert size={22} style={{ color: '#d97706' }} />
+              Pending Bank UTR Verifications ({pendingOrders.length} Orders Awaiting UTR Match)
+            </div>
+            <span style={{ fontSize: '12px', fontWeight: '700', color: '#a16207', backgroundColor: '#fef9c3', padding: '4px 10px', borderRadius: '8px' }}>
+              Check SBI / PhonePe Business App for UTR Match
+            </span>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {pendingOrders.map((ord) => (
+              <div key={ord.id} style={{ backgroundColor: '#fff', padding: '14px 18px', borderRadius: '12px', border: '1px solid #fef08a', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: '800', color: '#0f172a' }}>
+                    Order #{ord.order_number} • ₹{ord.total_amount.toFixed(2)} ({ord.customer_name} - {ord.customer_phone})
+                  </div>
+                  <div style={{ fontSize: '13px', fontWeight: '800', color: '#0284c7', fontFamily: 'monospace', marginTop: '2px' }}>
+                    Submitted UTR No: {ord.transaction_ref || 'N/A'}
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button
+                    onClick={() => handleConfirmPayment(ord.id)}
+                    style={{ padding: '8px 16px', fontSize: '13px', fontWeight: '800', backgroundColor: '#059669', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <CheckCircle2 size={16} /> UTR MATCHED (Confirm Paid)
+                  </button>
+                  <button
+                    onClick={() => handleRejectPayment(ord.id)}
+                    style={{ padding: '8px 14px', fontSize: '13px', fontWeight: '700', backgroundColor: '#fee2e2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <XCircle size={16} /> DID NOT MATCH (Reject Fake)
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards Grid */}
       <div style={{
