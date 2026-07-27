@@ -160,7 +160,7 @@ app.delete('/api/products/:id', async (req, res) => {
 // Place new order
 app.post('/api/orders', async (req, res) => {
   try {
-    const { user_id, customer_name, customer_phone, delivery_type, address, items, payment_status } = req.body;
+    const { user_id, customer_name, customer_phone, delivery_type, address, items, payment_status, transaction_ref } = req.body;
     const orderPaymentStatus = payment_status || (delivery_type.includes('COD') ? 'Pending COD' : 'Paid');
 
     if (!customer_name || !customer_phone || !delivery_type || !items || items.length === 0) {
@@ -205,9 +205,9 @@ app.post('/api/orders', async (req, res) => {
     db.serialize(async () => {
       try {
         const orderResult = await run(
-          `INSERT INTO orders (order_number, user_id, customer_name, customer_phone, delivery_type, address, subtotal, tax, total_amount, payment_status, status)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')`,
-          [order_number, orderUserId, customer_name, customer_phone, delivery_type, address || '', subtotal, tax, total_amount, orderPaymentStatus]
+          `INSERT INTO orders (order_number, user_id, customer_name, customer_phone, delivery_type, address, subtotal, tax, total_amount, payment_status, transaction_ref, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')`,
+          [order_number, orderUserId, customer_name, customer_phone, delivery_type, address || '', subtotal, tax, total_amount, orderPaymentStatus, transaction_ref || '']
         );
 
         const orderId = orderResult.lastID;

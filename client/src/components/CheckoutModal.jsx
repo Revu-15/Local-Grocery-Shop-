@@ -22,6 +22,7 @@ export default function CheckoutModal({
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCvv, setCardCvv] = useState('');
   const [upiId, setUpiId] = useState('rahul@okicici');
+  const [utrNumber, setUtrNumber] = useState('');
   const [hasCompletedOnlinePayment, setHasCompletedOnlinePayment] = useState(false);
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
@@ -38,6 +39,10 @@ export default function CheckoutModal({
       setError('Please enter a delivery address.');
       return;
     }
+    if (deliveryType === 'UPI' && (!utrNumber || utrNumber.length < 6)) {
+      setError('Please enter your 12-digit UPI Transaction UTR / Ref Number.');
+      return;
+    }
 
     try {
       setLoading(true);
@@ -50,6 +55,7 @@ export default function CheckoutModal({
         customer_phone: customerPhone,
         delivery_type: deliveryType === 'UPI' ? 'UPI (Online)' : deliveryType === 'Card' ? 'Card (Online)' : deliveryType === 'Pickup' ? 'In-Store Pickup' : 'Cash on Delivery',
         payment_status: isOnlinePaid ? 'Paid' : 'Pending COD',
+        transaction_ref: deliveryType === 'UPI' ? `UTR: ${utrNumber}` : (cardNumber ? `CARD: ****${cardNumber.slice(-4)}` : 'N/A'),
         address: deliveryType === 'Pickup' ? 'In-Store Pickup Counter' : address,
         items: cartItems.map((item) => ({
           product_id: item.product.id,
@@ -262,30 +268,60 @@ export default function CheckoutModal({
                 </a>
               </div>
 
-              {/* Payment Verification Checkbox */}
+              {/* UTR / Transaction Reference Number Input */}
+              <div style={{ marginTop: '14px', textAlign: 'left', backgroundColor: '#fff', padding: '12px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
+                <label style={{ display: 'block', fontSize: '11.5px', fontWeight: '800', color: '#166534', marginBottom: '4px' }}>
+                  Enter 12-Digit UPI Transaction UTR / Ref No. *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. 429182910481 (from GPay / PhonePe / Paytm)"
+                  value={utrNumber}
+                  onChange={(e) => {
+                    setUtrNumber(e.target.value);
+                    if (e.target.value.length >= 6) {
+                      setHasCompletedOnlinePayment(true);
+                    } else {
+                      setHasCompletedOnlinePayment(false);
+                    }
+                  }}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none', fontWeight: '600' }}
+                />
+                <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
+                  Enter UTR/Ref # from your payment app to verify & enable payment tick mark.
+                </div>
+              </div>
+
+              {/* Payment Verification Checkbox - Enabled ONLY after entering UTR */}
               <label style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                cursor: 'pointer',
-                marginTop: '14px',
+                cursor: (!utrNumber || utrNumber.length < 6) ? 'not-allowed' : 'pointer',
+                marginTop: '12px',
                 fontSize: '13px',
                 fontWeight: '700',
-                color: hasCompletedOnlinePayment ? '#15803d' : '#475569',
-                backgroundColor: hasCompletedOnlinePayment ? '#dcfce7' : '#fff',
+                color: hasCompletedOnlinePayment ? '#15803d' : '#94a3b8',
+                backgroundColor: hasCompletedOnlinePayment ? '#dcfce7' : '#f8fafc',
                 padding: '10px 14px',
                 borderRadius: '10px',
-                border: hasCompletedOnlinePayment ? '1.5px solid #86efac' : '1px solid #cbd5e1',
+                border: hasCompletedOnlinePayment ? '1.5px solid #86efac' : '1px solid #e2e8f0',
                 transition: 'all 0.2s'
               }}>
                 <input
                   type="checkbox"
+                  disabled={!utrNumber || utrNumber.length < 6}
                   checked={hasCompletedOnlinePayment}
                   onChange={(e) => setHasCompletedOnlinePayment(e.target.checked)}
-                  style={{ width: '18px', height: '18px', accentColor: '#059669', cursor: 'pointer' }}
+                  style={{ width: '18px', height: '18px', accentColor: '#059669', cursor: (!utrNumber || utrNumber.length < 6) ? 'not-allowed' : 'pointer' }}
                 />
-                <span>I have completed payment of ₹{total.toFixed(2)} on my UPI app</span>
+                <span>
+                  {hasCompletedOnlinePayment
+                    ? `✓ Payment Verified & Tick Marked (UTR: ${utrNumber})`
+                    : 'Enter UTR / Ref Number above to enable tick mark'}
+                </span>
               </label>
             </div>
           )}

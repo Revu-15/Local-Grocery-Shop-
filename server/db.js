@@ -72,6 +72,7 @@ export const initDatabase = async () => {
             tax REAL NOT NULL,
             total_amount REAL NOT NULL,
             payment_status TEXT NOT NULL DEFAULT 'Paid', -- 'Paid' or 'Pending COD'
+            transaction_ref TEXT, -- UPI UTR or Card Ref No.
             status TEXT NOT NULL DEFAULT 'Pending', -- 'Pending', 'Processing', 'Completed', 'Cancelled'
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
           )
@@ -80,6 +81,7 @@ export const initDatabase = async () => {
         // Migration helpers for table updates
         db.run(`ALTER TABLE orders ADD COLUMN user_id TEXT`, (err) => {});
         db.run(`ALTER TABLE orders ADD COLUMN payment_status TEXT DEFAULT 'Paid'`, (err) => {});
+        db.run(`ALTER TABLE orders ADD COLUMN transaction_ref TEXT`, (err) => {});
 
         // Order Items Table
         db.run(`
