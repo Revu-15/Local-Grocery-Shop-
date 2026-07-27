@@ -232,33 +232,46 @@ export default function CheckoutModal({
             <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #bbf7d0', padding: '16px', borderRadius: '16px', marginBottom: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                 <div style={{ fontSize: '13px', fontWeight: '800', color: '#166534', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <QrCode size={18} /> Scan & Pay via UPI QR Code
+                  <QrCode size={18} /> Scan & Pay Real Money via UPI
                 </div>
-                <span style={{ fontSize: '11px', fontWeight: '700', color: '#15803d', backgroundColor: '#dcfce7', padding: '2px 8px', borderRadius: '6px' }}>INSTANT VERIFICATION</span>
+                <span style={{ fontSize: '11px', fontWeight: '700', color: '#15803d', backgroundColor: '#dcfce7', padding: '2px 8px', borderRadius: '6px' }}>OFFICIAL UPI RECEIVER</span>
               </div>
 
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                {/* SVG Live UPI QR Code */}
-                <div style={{ width: '100px', height: '100px', backgroundColor: '#fff', padding: '6px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
-                    <path d="M0,0 h30 v30 h-30 z M40,0 h20 v10 h-20 z M70,0 h30 v30 h-30 z M10,10 h10 v10 h-10 z M80,10 h10 v10 h-10 z M0,40 h10 v20 h-10 z M20,40 h30 v10 h-30 z M60,40 h40 v10 h-40 z M0,70 h30 v30 h-30 z M10,80 h10 v10 h-10 z M40,60 h20 v40 h-20 z M70,70 h20 v10 h-20 z M90,90 h10 v10 h-10 z" fill="#059669" />
-                  </svg>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+                {/* Dynamic Real Scannable UPI QR Code Image */}
+                <div style={{ width: '120px', height: '120px', backgroundColor: '#fff', padding: '8px', borderRadius: '12px', border: '2px solid #059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`upi://pay?pa=polamreddyrevanth.82@oksbi&pn=FreshBasket%20Grocery&am=${total}&cu=INR`)}`}
+                    alt="Scan UPI QR Code to Pay Real Money"
+                    style={{ width: '100%', height: '100%', borderRadius: '4px' }}
+                  />
                 </div>
 
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '12px', color: '#166534', fontWeight: '700', marginBottom: '4px' }}>
-                    UPI ID: <span style={{ color: '#0f172a', fontFamily: 'monospace' }}>freshbasket@okicici</span>
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <div style={{ fontSize: '13px', color: '#166534', fontWeight: '800', marginBottom: '4px' }}>
+                    Payee UPI ID: <span style={{ color: '#0f172a', fontFamily: 'monospace', backgroundColor: '#fff', padding: '2px 6px', borderRadius: '4px', border: '1px solid #cbd5e1' }}>polamreddyrevanth.82@oksbi</span>
                   </div>
-                  <div style={{ fontSize: '11px', color: '#475569', marginBottom: '8px' }}>
-                    Supported Apps: <strong>Google Pay, PhonePe, Paytm, BHIM</strong>
+                  <div style={{ fontSize: '12px', color: '#059669', fontWeight: '700', marginBottom: '8px' }}>
+                    Amount Payable: <span style={{ fontSize: '14px', color: '#0f172a' }}>₹{total.toFixed(2)}</span>
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Enter your VPA/UPI ID (e.g. name@upi)"
-                    value={upiId}
-                    onChange={(e) => setUpiId(e.target.value)}
-                    style={{ width: '100%', padding: '6px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '12px' }}
-                  />
+                  <div style={{ fontSize: '11px', color: '#475569', marginBottom: '10px' }}>
+                    Scan with <strong>Google Pay, PhonePe, Paytm, BHIM</strong> to send payment directly to store owner bank account.
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button
+                      type="button"
+                      onClick={() => navigator.clipboard.writeText('polamreddyrevanth.82@oksbi')}
+                      style={{ padding: '6px 12px', fontSize: '11px', fontWeight: '700', backgroundColor: '#059669', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
+                    >
+                      📋 Copy UPI ID
+                    </button>
+                    <a
+                      href={`upi://pay?pa=polamreddyrevanth.82@oksbi&pn=FreshBasket%20Grocery&am=${total}&cu=INR`}
+                      style={{ padding: '6px 12px', fontSize: '11px', fontWeight: '700', backgroundColor: '#0f172a', color: '#fff', borderRadius: '8px', textDecoration: 'none', display: 'inline-block' }}
+                    >
+                      📲 Open Mobile UPI App
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
