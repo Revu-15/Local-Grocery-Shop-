@@ -16,6 +16,8 @@ export default function UserAuthModal({ isOpen, onClose, user, onSaveUser, onSig
     address: user?.address || ''
   });
 
+  const [successMsg, setSuccessMsg] = useState('');
+
   const handleSignInSubmit = (e) => {
     e.preventDefault();
     const loggedUser = {
@@ -31,15 +33,16 @@ export default function UserAuthModal({ isOpen, onClose, user, onSaveUser, onSig
 
   const handleSignUpSubmit = (e) => {
     e.preventDefault();
-    const newUser = {
+    const createdUser = {
       id: 'USER-' + Date.now().toString().slice(-6),
       name: signUpData.name,
       email: signUpData.email,
       phone: signUpData.phone,
       address: signUpData.address
     };
-    onSaveUser(newUser);
-    onClose();
+    setSignInEmail(signUpData.email || signUpData.phone);
+    setSuccessMsg(`✓ Account for "${signUpData.name}" created successfully! Please Sign In below with your credentials.`);
+    setAuthMode('signin');
   };
 
   const handleQuickLogin = (demoUser) => {
@@ -157,6 +160,12 @@ export default function UserAuthModal({ isOpen, onClose, user, onSaveUser, onSig
         {/* Tab 1: SIGN IN FORM */}
         {authMode === 'signin' ? (
           <form onSubmit={handleSignInSubmit} style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {successMsg && (
+              <div style={{ backgroundColor: '#dcfce7', border: '1.5px solid #86efac', color: '#15803d', padding: '12px 14px', borderRadius: '12px', fontSize: '13px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <ShieldCheck size={18} style={{ color: '#059669', flexShrink: 0 }} />
+                <div>{successMsg}</div>
+              </div>
+            )}
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#475569', marginBottom: '6px' }}>
                 Email Address or Phone Number *
