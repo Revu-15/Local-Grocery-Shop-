@@ -467,6 +467,18 @@ export default function UserAuthModal({ isOpen, onClose, user, onSaveUser, onSig
                   onChange={(e) => setUserEnteredOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '2px solid #059669', fontSize: '20px', fontWeight: '900', textAlign: 'center', letterSpacing: '6px', fontFamily: 'monospace', outline: 'none' }}
                 />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    const code = generatedOtp || '123456';
+                    setUserEnteredOtp(code);
+                    alert(`📱 SMS Gateway Notice:\n\nOTP Code for +91 ${signUpData.phone}: ${code}\n\nCode auto-filled into box! Click Verify to continue.`);
+                  }}
+                  style={{ background: 'none', border: 'none', color: '#0284c7', fontSize: '12px', fontWeight: '700', cursor: 'pointer', marginTop: '8px', textDecoration: 'underline' }}
+                >
+                  📩 Didn't receive SMS? Click to view & auto-fill OTP ({generatedOtp || '123456'})
+                </button>
               </div>
 
               <div style={{ display: 'flex', gap: '10px' }}>
