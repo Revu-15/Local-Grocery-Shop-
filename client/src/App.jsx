@@ -47,37 +47,20 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isAdminAuthenticated]);
 
-  // Logged-in Customer Profile State
+  // Logged-in Customer Profile State (null for new guest visitors)
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem('lgs_user');
-      return saved ? JSON.parse(saved) : {
-        name: 'Rahul Sharma',
-        email: 'rahul.sharma@gmail.com',
-        phone: '9876543210',
-        address: '100 Feet Road, Indiranagar, Bengaluru'
-      };
+      return saved ? JSON.parse(saved) : null;
     } catch {
-      return {
-        name: 'Rahul Sharma',
-        email: 'rahul.sharma@gmail.com',
-        phone: '9876543210',
-        address: '100 Feet Road, Indiranagar, Bengaluru'
-      };
+      return null;
     }
   });
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const handleSignOut = () => {
-    const freshUser = {
-      id: 'USER-' + Date.now().toString().slice(-6),
-      name: 'Guest Customer',
-      email: '',
-      phone: '',
-      address: ''
-    };
-    setUser(freshUser);
+    setUser(null);
     try {
       localStorage.removeItem('lgs_user');
     } catch (e) {

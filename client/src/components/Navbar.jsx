@@ -196,7 +196,9 @@ export default function Navbar({
               title="Click to change username, email, phone or delivery address"
             >
               <User size={15} />
-              <span style={{ fontWeight: '700' }}>{user?.name || 'Customer Login'}</span>
+              <span style={{ fontWeight: '700' }}>
+                {user?.name ? `👤 ${user.name}` : '🔑 Login / Register'}
+              </span>
             </button>
           )}
 
