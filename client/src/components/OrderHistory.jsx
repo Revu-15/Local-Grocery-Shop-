@@ -2,19 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { fetchOrders } from '../utils/api';
 import { Package, Clock, Printer, ChevronDown, ChevronUp, ShoppingBag, Truck, Store } from 'lucide-react';
 
-export default function OrderHistory({ onSelectReceipt }) {
+export default function OrderHistory({ onSelectReceipt, user }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
 
   useEffect(() => {
     loadOrders();
-  }, []);
+  }, [user]);
 
   const loadOrders = async () => {
     try {
       setLoading(true);
-      const data = await fetchOrders();
+      const data = await fetchOrders({
+        user_id: user?.id,
+        phone: user?.phone
+      });
       setOrders(data);
     } catch (err) {
       console.error('Failed to load order history:', err);

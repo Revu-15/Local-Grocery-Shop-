@@ -37,6 +37,7 @@ export default function CheckoutModal({
       setError('');
 
       const orderPayload = {
+        user_id: user?.id,
         customer_name: customerName,
         customer_phone: customerPhone,
         delivery_type: deliveryType,

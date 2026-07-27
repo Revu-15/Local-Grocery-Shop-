@@ -63,6 +63,7 @@ export const initDatabase = async () => {
           CREATE TABLE IF NOT EXISTS orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             order_number TEXT UNIQUE NOT NULL,
+            user_id TEXT,
             customer_name TEXT NOT NULL,
             customer_phone TEXT NOT NULL,
             delivery_type TEXT NOT NULL, -- 'COD' or 'Pickup'
@@ -74,6 +75,11 @@ export const initDatabase = async () => {
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
           )
         `);
+
+        // Migration helper: add user_id column if table already exists
+        db.run(`ALTER TABLE orders ADD COLUMN user_id TEXT`, (err) => {
+          // ignore column already exists error
+        });
 
         // Order Items Table
         db.run(`

@@ -77,6 +77,8 @@ export const fetchOrders = async (filters = {}) => {
   const params = new URLSearchParams();
   if (filters.status && filters.status !== 'All') params.append('status', filters.status);
   if (filters.search) params.append('search', filters.search);
+  if (filters.user_id) params.append('user_id', filters.user_id);
+  if (filters.phone) params.append('phone', filters.phone);
 
   const res = await fetch(`${API_BASE}/orders?${params.toString()}`);
   if (!res.ok) throw new Error('Failed to fetch orders');

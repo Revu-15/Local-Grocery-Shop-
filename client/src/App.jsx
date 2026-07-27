@@ -181,7 +181,7 @@ export default function App() {
               updateQuantity={updateQuantity}
             />
           ) : (
-            <OrderHistory onSelectReceipt={(ord) => setReceiptOrder(ord)} />
+            <OrderHistory onSelectReceipt={(ord) => setReceiptOrder(ord)} user={user} />
           )
         ) : (
           activeTab === 'dashboard' ? (

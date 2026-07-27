@@ -160,7 +160,7 @@ app.delete('/api/products/:id', async (req, res) => {
 // Place new order
 app.post('/api/orders', async (req, res) => {
   try {
-    const { customer_name, customer_phone, delivery_type, address, items } = req.body;
+    const { user_id, customer_name, customer_phone, delivery_type, address, items } = req.body;
 
     if (!customer_name || !customer_phone || !delivery_type || !items || items.length === 0) {
       return res.status(400).json({ error: 'Please provide customer details, fulfillment type, and at least one item.' });
@@ -198,14 +198,15 @@ app.post('/api/orders', async (req, res) => {
     const tax = Math.round(subtotal * 0.05 * 100) / 100; // 5% sales tax
     const total_amount = Math.round((subtotal + tax) * 100) / 100;
     const order_number = 'LGS-' + Date.now().toString().slice(-6) + Math.floor(Math.random() * 90 + 10);
+    const orderUserId = user_id || `USER-${customer_phone}`;
 
     // Step 2: Atomic execution of Order Creation & Stock Deduction
     db.serialize(async () => {
       try {
         const orderResult = await run(
-          `INSERT INTO orders (order_number, customer_name, customer_phone, delivery_type, address, subtotal, tax, total_amount, status)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'Pending')`,
-          [order_number, customer_name, customer_phone, delivery_type, address || '', subtotal, tax, total_amount]
+          `INSERT INTO orders (order_number, user_id, customer_name, customer_phone, delivery_type, address, subtotal, tax, total_amount, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')`,
+          [order_number, orderUserId, customer_name, customer_phone, delivery_type, address || '', subtotal, tax, total_amount]
         );
 
         const orderId = orderResult.lastID;
@@ -245,11 +246,19 @@ app.post('/api/orders', async (req, res) => {
 });
 
 // Get orders list
-app.get('/api/orders', async (req, res) => {
+app.get(['/api/orders', '/orders'], async (req, res) => {
   try {
-    const { status, search } = req.query;
+    const { status, search, user_id, phone } = req.query;
     let sql = 'SELECT * FROM orders WHERE 1=1';
     const params = [];
+
+    if (user_id) {
+      sql += ' AND (user_id = ? OR customer_phone = ?)';
+      params.push(user_id, phone || user_id);
+    } else if (phone) {
+      sql += ' AND customer_phone = ?';
+      params.push(phone);
+    }
 
     if (status && status !== 'All') {
       sql += ' AND status = ?';

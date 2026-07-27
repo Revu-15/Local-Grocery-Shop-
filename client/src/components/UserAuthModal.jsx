@@ -77,6 +77,9 @@ export default function UserAuthModal({ isOpen, onClose, user, onSaveUser }) {
             <User size={26} />
           </div>
           <h2 style={{ fontSize: '20px', fontWeight: '800', margin: 0 }}>Customer Login & Profile</h2>
+          <div style={{ display: 'inline-block', fontSize: '11px', fontWeight: '800', backgroundColor: 'rgba(255,255,255,0.25)', padding: '2px 8px', borderRadius: '6px', marginTop: '6px' }}>
+            ACCOUNT ID: {user?.id || 'GUEST-ID'}
+          </div>
           <p style={{ fontSize: '13px', color: '#a7f3d0', margin: '4px 0 0 0' }}>
             Enter your details for quick checkout & order tracking
           </p>
