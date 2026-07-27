@@ -327,6 +327,21 @@ app.patch('/api/orders/:id/status', async (req, res) => {
   }
 });
 
+// Update order payment status (Admin: Confirm UPI payment received -> Paid)
+app.patch('/api/orders/:id/payment-status', async (req, res) => {
+  try {
+    const { payment_status } = req.body;
+    if (!payment_status) return res.status(400).json({ error: 'payment_status is required' });
+
+    await run('UPDATE orders SET payment_status = ? WHERE id = ?', [payment_status, req.params.id]);
+    const updated = await getOne('SELECT * FROM orders WHERE id = ?', [req.params.id]);
+    const items = await query('SELECT * FROM order_items WHERE order_id = ?', [req.params.id]);
+    res.json({ ...updated, items });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update payment status' });
+  }
+});
+
 // ----------------------------------------------------
 // REPORTS & ANALYTICS ENDPOINTS
 // ----------------------------------------------------

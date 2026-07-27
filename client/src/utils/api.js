@@ -95,6 +95,16 @@ export const updateOrderStatus = async (id, status) => {
   return res.json();
 };
 
+export const updateOrderPaymentStatus = async (id, payment_status) => {
+  const res = await fetch(`${API_BASE}/orders/${id}/payment-status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ payment_status })
+  });
+  if (!res.ok) throw new Error('Failed to update payment status');
+  return res.json();
+};
+
 export const fetchSalesReport = async () => {
   const res = await fetch(`${API_BASE}/reports/daily-sales`);
   if (!res.ok) throw new Error('Failed to fetch sales report');

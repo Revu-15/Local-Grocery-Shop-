@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { fetchOrders, updateOrderStatus } from '../utils/api';
-import { ClipboardList, Search, Printer, Truck, Store, Phone, MapPin, Clock } from 'lucide-react';
+import { fetchOrders, updateOrderStatus, updateOrderPaymentStatus } from '../utils/api';
+import { ClipboardList, Search, Printer, Truck, Store, Phone, MapPin, Clock, CheckCircle2, XCircle } from 'lucide-react';
 
 export default function AdminOrders({ onSelectReceipt, searchQuery }) {
   const [orders, setOrders] = useState([]);
@@ -29,6 +29,29 @@ export default function AdminOrders({ onSelectReceipt, searchQuery }) {
       await updateOrderStatus(orderId, newStatus);
     } catch (err) {
       alert('Failed to update status: ' + err.message);
+      loadOrders();
+    }
+  };
+
+  const handleConfirmPayment = async (orderId) => {
+    try {
+      setOrders(orders.map((o) => (o.id === orderId ? { ...o, payment_status: 'Paid', status: 'Processing' } : o)));
+      await updateOrderPaymentStatus(orderId, 'Paid');
+      await updateOrderStatus(orderId, 'Processing');
+    } catch (err) {
+      alert('Failed to confirm payment: ' + err.message);
+      loadOrders();
+    }
+  };
+
+  const handleRejectPayment = async (orderId) => {
+    if (!confirm('Reject this fake UTR / order and restore inventory stock?')) return;
+    try {
+      setOrders(orders.map((o) => (o.id === orderId ? { ...o, payment_status: 'Rejected', status: 'Cancelled' } : o)));
+      await updateOrderPaymentStatus(orderId, 'Rejected (Fake UTR)');
+      await updateOrderStatus(orderId, 'Cancelled');
+    } catch (err) {
+      alert('Failed to reject order: ' + err.message);
       loadOrders();
     }
   };
@@ -88,7 +111,8 @@ export default function AdminOrders({ onSelectReceipt, searchQuery }) {
                   <th style={{ padding: '14px 20px' }}>Order Details</th>
                   <th style={{ padding: '14px 20px' }}>Customer Info</th>
                   <th style={{ padding: '14px 20px' }}>Fulfillment</th>
-                  <th style={{ padding: '14px 20px' }}>Items Summary</th>
+                  <th style={{ padding: '14px 20px' }}>Bank Payment Verification</th>
+                  <th style={{ padding: '14px 20px' }}>Items</th>
                   <th style={{ padding: '14px 20px' }}>Total</th>
                   <th style={{ padding: '14px 20px' }}>Order Status</th>
                   <th style={{ padding: '14px 20px', textAlign: 'right' }}>Billing Receipt</th>
@@ -122,8 +146,46 @@ export default function AdminOrders({ onSelectReceipt, searchQuery }) {
                     <td style={{ padding: '14px 20px' }}>
                       <span className={`badge ${ord.delivery_type === 'COD' ? 'badge-info' : 'badge-warning'}`}>
                         {ord.delivery_type === 'COD' ? <Truck size={12} /> : <Store size={12} />}
-                        {ord.delivery_type === 'COD' ? 'Cash on Delivery' : 'Pickup Counter'}
+                        {ord.delivery_type}
                       </span>
+                    </td>
+
+                    {/* Bank Payment Verification */}
+                    <td style={{ padding: '14px 20px', minWidth: '220px' }}>
+                      <div style={{ marginBottom: '4px' }}>
+                        <span style={{
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          fontSize: '11px',
+                          fontWeight: '800',
+                          backgroundColor: ord.payment_status === 'Paid' ? '#dcfce7' : '#fef3c7',
+                          color: ord.payment_status === 'Paid' ? '#15803d' : '#b45309'
+                        }}>
+                          {ord.payment_status === 'Paid' ? '✓ PAID & VERIFIED' : `⏳ ${ord.payment_status || 'Pending'}`}
+                        </span>
+                      </div>
+                      {ord.transaction_ref && (
+                        <div style={{ fontSize: '11px', fontWeight: '800', color: '#0284c7', fontFamily: 'monospace', backgroundColor: '#f0f9ff', padding: '2px 6px', borderRadius: '4px', border: '1px solid #bae6fd', display: 'inline-block', marginBottom: '6px' }}>
+                          {ord.transaction_ref}
+                        </div>
+                      )}
+                      {ord.payment_status !== 'Paid' && ord.status !== 'Cancelled' && (
+                        <div style={{ display: 'flex', gap: '6px', marginTop: '4px' }}>
+                          <button
+                            onClick={() => handleConfirmPayment(ord.id)}
+                            style={{ padding: '4px 10px', fontSize: '11px', fontWeight: '800', backgroundColor: '#059669', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                          >
+                            <CheckCircle2 size={12} /> Confirm Money Received
+                          </button>
+                          <button
+                            onClick={() => handleRejectPayment(ord.id)}
+                            style={{ padding: '4px 8px', fontSize: '11px', fontWeight: '700', backgroundColor: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                            title="Reject fake UTR"
+                          >
+                            <XCircle size={12} />
+                          </button>
+                        </div>
+                      )}
                     </td>
 
                     {/* Items Summary */}
