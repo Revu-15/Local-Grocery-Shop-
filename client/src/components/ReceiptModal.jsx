@@ -160,7 +160,10 @@ export default function ReceiptModal({ order, onClose }) {
             <div>
               <strong>Order #:</strong> {order.order_number}<br />
               <strong>Date:</strong> {new Date(order.created_at || Date.now()).toLocaleString()}<br />
-              <strong>Fulfillment:</strong> {order.delivery_type === 'COD' ? 'Cash on Delivery' : 'In-Store Pickup'}
+              <strong>Fulfillment:</strong> {order.delivery_type}<br />
+              <strong>Payment Status:</strong> <span style={{ color: (order.payment_status === 'Paid' || order.delivery_type.includes('UPI') || order.delivery_type.includes('Card') || order.delivery_type.includes('Online')) ? '#059669' : '#d97706', fontWeight: '800' }}>
+                {(order.payment_status === 'Paid' || order.delivery_type.includes('UPI') || order.delivery_type.includes('Card') || order.delivery_type.includes('Online')) ? '✓ PAID ONLINE' : '⏳ PENDING (COD)'}
+              </span>
             </div>
             <div>
               <strong>Customer:</strong> {order.customer_name}<br />

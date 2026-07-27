@@ -104,10 +104,20 @@ export default function OrderHistory({ onSelectReceipt, user }) {
                           Order #{order.order_number}
                         </span>
                         {getStatusBadge(order.status)}
+                        <span style={{
+                          fontSize: '11px',
+                          fontWeight: '800',
+                          padding: '2px 8px',
+                          borderRadius: '6px',
+                          backgroundColor: (order.payment_status === 'Paid' || order.delivery_type.includes('UPI') || order.delivery_type.includes('Card') || order.delivery_type.includes('Online')) ? '#dcfce7' : '#fef3c7',
+                          color: (order.payment_status === 'Paid' || order.delivery_type.includes('UPI') || order.delivery_type.includes('Card') || order.delivery_type.includes('Online')) ? '#15803d' : '#b45309'
+                        }}>
+                          {(order.payment_status === 'Paid' || order.delivery_type.includes('UPI') || order.delivery_type.includes('Card') || order.delivery_type.includes('Online')) ? '✓ PAID ONLINE' : '⏳ PENDING (COD)'}
+                        </span>
                       </div>
                       <div style={{ fontSize: '12px', color: '#64748b', marginTop: '4px', display: 'flex', gap: '12px' }}>
                         <span><Clock size={12} style={{ display: 'inline', marginRight: '4px' }} /> {new Date(order.created_at).toLocaleString()}</span>
-                        <span>• {order.delivery_type === 'COD' ? 'Cash on Delivery' : 'In-Store Pickup'}</span>
+                        <span>• {order.delivery_type}</span>
                       </div>
                     </div>
                   </div>

@@ -42,11 +42,13 @@ export default function CheckoutModal({
       setLoading(true);
       setError('');
 
+      const isOnlinePaid = deliveryType === 'UPI' || deliveryType === 'Card';
       const orderPayload = {
         user_id: user?.id,
         customer_name: customerName,
         customer_phone: customerPhone,
-        delivery_type: deliveryType === 'Pickup' ? 'Pickup' : `Online (${deliveryType})`,
+        delivery_type: deliveryType === 'UPI' ? 'UPI (Online)' : deliveryType === 'Card' ? 'Card (Online)' : deliveryType === 'Pickup' ? 'In-Store Pickup' : 'Cash on Delivery',
+        payment_status: isOnlinePaid ? 'Paid' : 'Pending COD',
         address: deliveryType === 'Pickup' ? 'In-Store Pickup Counter' : address,
         items: cartItems.map((item) => ({
           product_id: item.product.id,
@@ -397,9 +399,16 @@ export default function CheckoutModal({
             type="submit"
             disabled={loading}
             className="btn btn-primary"
-            style={{ width: '100%', padding: '14px', fontSize: '16px', borderRadius: '12px' }}
+            style={{
+              width: '100%',
+              padding: '14px',
+              fontSize: '15px',
+              borderRadius: '12px',
+              backgroundColor: (deliveryType === 'UPI' || deliveryType === 'Card') ? '#059669' : '#0f172a',
+              borderColor: (deliveryType === 'UPI' || deliveryType === 'Card') ? '#059669' : '#0f172a'
+            }}
           >
-            {loading ? 'Processing Order...' : `Pay ₹${total.toFixed(2)} & Place Order`}
+            {loading ? 'Processing Order...' : (deliveryType === 'UPI' || deliveryType === 'Card') ? `✓ Payment Paid (₹${total.toFixed(2)}) - Submit Order` : `Place Order (₹${total.toFixed(2)})`}
           </button>
         </form>
       </div>

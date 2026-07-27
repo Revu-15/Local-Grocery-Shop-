@@ -160,7 +160,8 @@ app.delete('/api/products/:id', async (req, res) => {
 // Place new order
 app.post('/api/orders', async (req, res) => {
   try {
-    const { user_id, customer_name, customer_phone, delivery_type, address, items } = req.body;
+    const { user_id, customer_name, customer_phone, delivery_type, address, items, payment_status } = req.body;
+    const orderPaymentStatus = payment_status || (delivery_type.includes('COD') ? 'Pending COD' : 'Paid');
 
     if (!customer_name || !customer_phone || !delivery_type || !items || items.length === 0) {
       return res.status(400).json({ error: 'Please provide customer details, fulfillment type, and at least one item.' });
@@ -204,9 +205,9 @@ app.post('/api/orders', async (req, res) => {
     db.serialize(async () => {
       try {
         const orderResult = await run(
-          `INSERT INTO orders (order_number, user_id, customer_name, customer_phone, delivery_type, address, subtotal, tax, total_amount, status)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')`,
-          [order_number, orderUserId, customer_name, customer_phone, delivery_type, address || '', subtotal, tax, total_amount]
+          `INSERT INTO orders (order_number, user_id, customer_name, customer_phone, delivery_type, address, subtotal, tax, total_amount, payment_status, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending')`,
+          [order_number, orderUserId, customer_name, customer_phone, delivery_type, address || '', subtotal, tax, total_amount, orderPaymentStatus]
         );
 
         const orderId = orderResult.lastID;
