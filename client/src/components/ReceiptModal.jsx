@@ -112,8 +112,8 @@ export default function ReceiptModal({ order, onClose }) {
           alignItems: 'center',
           justifyContent: 'space-between'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#15803d', fontWeight: '700', fontSize: '14px' }}>
-            <CheckCircle size={18} /> Order Confirmed & Receipt Generated
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: order.payment_status === 'Paid' ? '#15803d' : '#b45309', fontWeight: '700', fontSize: '14px' }}>
+            <CheckCircle size={18} /> {order.payment_status === 'Paid' ? 'Order Confirmed & Payment Verified' : 'Order Submitted - Awaiting Bank Verification'}
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <button
@@ -216,8 +216,8 @@ export default function ReceiptModal({ order, onClose }) {
               <span>GST Tax (5%):</span>
               <span>₹{order.tax?.toFixed(2)}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '18px', fontWeight: '900', color: '#059669', paddingTop: '8px', borderTop: '1px solid #cbd5e1' }}>
-              <span>TOTAL PAID:</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: '900', color: order.payment_status === 'Paid' ? '#059669' : '#d97706', paddingTop: '8px', borderTop: '1px solid #cbd5e1' }}>
+              <span>{order.payment_status === 'Paid' ? 'TOTAL PAID:' : 'TOTAL PAYABLE (UNVERIFIED):'}</span>
               <span>₹{order.total_amount?.toFixed(2)}</span>
             </div>
           </div>
