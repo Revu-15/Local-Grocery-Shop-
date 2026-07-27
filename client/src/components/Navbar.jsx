@@ -203,7 +203,15 @@ export default function Navbar({
             borderRadius: '9999px'
           }}>
             <button
-              onClick={() => { setRole('customer'); setActiveTab('shop'); }}
+              onClick={() => {
+                if (role === 'customer') {
+                  onOpenAuthModal();
+                } else {
+                  setRole('customer');
+                  setActiveTab('shop');
+                }
+              }}
+              title="Click to switch to customer view or edit login profile"
               style={{
                 padding: '6px 14px',
                 borderRadius: '9999px',
@@ -220,7 +228,7 @@ export default function Navbar({
                 transition: 'all 0.2s'
               }}
             >
-              <UserCheck size={14} /> Customer
+              <UserCheck size={14} /> {user?.name ? `👤 ${user.name}` : 'Customer Login'}
             </button>
             <button
               onClick={() => { setRole('admin'); setActiveTab('dashboard'); }}
