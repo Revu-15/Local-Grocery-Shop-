@@ -9,6 +9,7 @@ import AdminDashboard from './components/AdminDashboard';
 import AdminInventory from './components/AdminInventory';
 import UserAuthModal from './components/UserAuthModal';
 import AdminAuthModal from './components/AdminAuthModal';
+import Footer from './components/Footer';
 import { fetchProducts, createOrder } from './utils/api';
 
 export default function App() {
@@ -231,6 +232,16 @@ export default function App() {
           )
         )}
       </main>
+
+      {/* Trust Features & Footer Banner */}
+      <Footer
+        onCategorySelect={(cat) => {
+          setSelectedCategory(cat);
+          setActiveTab('shop');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+        onRequestAdminAccess={handleRequestAdminAccess}
+      />
 
       {/* Cart Drawer */}
       <CartDrawer
