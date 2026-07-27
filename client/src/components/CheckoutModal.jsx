@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Truck, Store, User, Phone, MapPin, CreditCard, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { X, Truck, Store, User, Phone, MapPin, CreditCard, AlertCircle, CheckCircle2, QrCode, ShieldCheck, Wallet, Landmark } from 'lucide-react';
 
 export default function CheckoutModal({
   isOpen,
@@ -12,10 +12,16 @@ export default function CheckoutModal({
 
   const [customerName, setCustomerName] = useState(user?.name || 'Rahul Sharma');
   const [customerPhone, setCustomerPhone] = useState(user?.phone || '9876543210');
-  const [deliveryType, setDeliveryType] = useState('COD'); // 'COD' or 'Pickup'
+  const [deliveryType, setDeliveryType] = useState('COD'); // 'COD', 'UPI', 'Card', 'Pickup'
   const [address, setAddress] = useState(user?.address || '12 MG Road, Indiranagar, Bengaluru');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Online Payment Card Fields
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
+  const [upiId, setUpiId] = useState('rahul@okicici');
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   const tax = Math.round(subtotal * 0.05 * 100) / 100;
@@ -27,8 +33,8 @@ export default function CheckoutModal({
       setError('Please provide your name and phone number.');
       return;
     }
-    if (deliveryType === 'COD' && !address) {
-      setError('Please enter a delivery address for Cash on Delivery.');
+    if ((deliveryType === 'COD' || deliveryType === 'UPI' || deliveryType === 'Card') && !address) {
+      setError('Please enter a delivery address.');
       return;
     }
 
@@ -40,15 +46,15 @@ export default function CheckoutModal({
         user_id: user?.id,
         customer_name: customerName,
         customer_phone: customerPhone,
-        delivery_type: deliveryType,
-        address: deliveryType === 'COD' ? address : 'In-Store Pickup Counter',
+        delivery_type: deliveryType === 'Pickup' ? 'Pickup' : `Online (${deliveryType})`,
+        address: deliveryType === 'Pickup' ? 'In-Store Pickup Counter' : address,
         items: cartItems.map((item) => ({
           product_id: item.product.id,
           quantity: item.quantity
         }))
       };
 
-      const result = await onOrderSuccess(orderPayload);
+      await onOrderSuccess(orderPayload);
       onClose();
     } catch (err) {
       setError(err.message || 'Failed to complete checkout.');
@@ -60,24 +66,28 @@ export default function CheckoutModal({
   return (
     <div style={{
       position: 'fixed',
-      inset: 0,
-      zIndex: 60,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(15, 23, 42, 0.75)',
+      backdropFilter: 'blur(4px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: 'rgba(15, 23, 42, 0.6)',
-      backdropFilter: 'blur(4px)',
+      zIndex: 1000,
       padding: '20px'
     }}>
       <div className="glass-card animate-fade-in" style={{
         width: '100%',
         maxWidth: '560px',
-        borderRadius: '20px',
+        maxHeight: '90vh',
         backgroundColor: '#fff',
-        overflow: 'hidden',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+        borderRadius: '24px',
+        boxShadow: '0 25px 50px rgba(0,0,0,0.25)',
+        overflowY: 'auto'
       }}>
-        {/* Header */}
+        {/* Modal Header */}
         <div style={{
           padding: '20px 24px',
           borderBottom: '1px solid #e2e8f0',
@@ -87,8 +97,8 @@ export default function CheckoutModal({
           backgroundColor: '#f8fafc'
         }}>
           <div>
-            <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a' }}>Complete Order Checkout</h3>
-            <p style={{ fontSize: '12px', color: '#64748b' }}>Select fulfillment mode and customer info</p>
+            <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a', margin: 0 }}>Complete Order Checkout</h3>
+            <p style={{ fontSize: '12px', color: '#64748b', margin: '2px 0 0 0' }}>Select payment option & delivery details</p>
           </div>
           <button
             onClick={onClose}
@@ -117,17 +127,64 @@ export default function CheckoutModal({
             </div>
           )}
 
-          {/* Fulfillment Type Selection */}
+          {/* Payment Method Selector */}
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', color: '#0f172a', marginBottom: '8px' }}>
-              Fulfillment Method
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '800', color: '#0f172a', marginBottom: '10px' }}>
+              Select Payment & Fulfillment Option *
             </label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              {/* Option 1: Instant UPI / QR */}
+              <button
+                type="button"
+                onClick={() => setDeliveryType('UPI')}
+                style={{
+                  padding: '12px',
+                  borderRadius: '12px',
+                  border: deliveryType === 'UPI' ? '2px solid #059669' : '1px solid #cbd5e1',
+                  backgroundColor: deliveryType === 'UPI' ? '#ecfdf5' : '#fff',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}
+              >
+                <QrCode size={22} style={{ color: deliveryType === 'UPI' ? '#059669' : '#64748b' }} />
+                <div>
+                  <div style={{ fontWeight: '800', fontSize: '13px', color: '#0f172a' }}>UPI / QR Code</div>
+                  <div style={{ fontSize: '11px', color: '#059669', fontWeight: '700' }}>GPay, PhonePe, Paytm</div>
+                </div>
+              </button>
+
+              {/* Option 2: Card / Net Banking */}
+              <button
+                type="button"
+                onClick={() => setDeliveryType('Card')}
+                style={{
+                  padding: '12px',
+                  borderRadius: '12px',
+                  border: deliveryType === 'Card' ? '2px solid #059669' : '1px solid #cbd5e1',
+                  backgroundColor: deliveryType === 'Card' ? '#ecfdf5' : '#fff',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px'
+                }}
+              >
+                <CreditCard size={22} style={{ color: deliveryType === 'Card' ? '#059669' : '#64748b' }} />
+                <div>
+                  <div style={{ fontWeight: '800', fontSize: '13px', color: '#0f172a' }}>Credit / Debit Card</div>
+                  <div style={{ fontSize: '11px', color: '#64748b' }}>Visa, Mastercard, RuPay</div>
+                </div>
+              </button>
+
+              {/* Option 3: COD */}
               <button
                 type="button"
                 onClick={() => setDeliveryType('COD')}
                 style={{
-                  padding: '14px',
+                  padding: '12px',
                   borderRadius: '12px',
                   border: deliveryType === 'COD' ? '2px solid #059669' : '1px solid #cbd5e1',
                   backgroundColor: deliveryType === 'COD' ? '#ecfdf5' : '#fff',
@@ -141,15 +198,16 @@ export default function CheckoutModal({
                 <Truck size={20} style={{ color: deliveryType === 'COD' ? '#059669' : '#64748b' }} />
                 <div>
                   <div style={{ fontWeight: '800', fontSize: '13px', color: '#0f172a' }}>Cash on Delivery</div>
-                  <div style={{ fontSize: '11px', color: '#64748b' }}>Pay at doorstep</div>
+                  <div style={{ fontSize: '11px', color: '#64748b' }}>Pay cash at doorstep</div>
                 </div>
               </button>
 
+              {/* Option 4: Pickup */}
               <button
                 type="button"
                 onClick={() => setDeliveryType('Pickup')}
                 style={{
-                  padding: '14px',
+                  padding: '12px',
                   borderRadius: '12px',
                   border: deliveryType === 'Pickup' ? '2px solid #059669' : '1px solid #cbd5e1',
                   backgroundColor: deliveryType === 'Pickup' ? '#ecfdf5' : '#fff',
@@ -168,6 +226,89 @@ export default function CheckoutModal({
               </button>
             </div>
           </div>
+
+          {/* ONLINE PAYMENT INTERFACES */}
+          {deliveryType === 'UPI' && (
+            <div style={{ backgroundColor: '#f0fdf4', border: '1.5px solid #bbf7d0', padding: '16px', borderRadius: '16px', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <div style={{ fontSize: '13px', fontWeight: '800', color: '#166534', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <QrCode size={18} /> Scan & Pay via UPI QR Code
+                </div>
+                <span style={{ fontSize: '11px', fontWeight: '700', color: '#15803d', backgroundColor: '#dcfce7', padding: '2px 8px', borderRadius: '6px' }}>INSTANT VERIFICATION</span>
+              </div>
+
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                {/* SVG Live UPI QR Code */}
+                <div style={{ width: '100px', height: '100px', backgroundColor: '#fff', padding: '6px', borderRadius: '12px', border: '1px solid #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%' }}>
+                    <path d="M0,0 h30 v30 h-30 z M40,0 h20 v10 h-20 z M70,0 h30 v30 h-30 z M10,10 h10 v10 h-10 z M80,10 h10 v10 h-10 z M0,40 h10 v20 h-10 z M20,40 h30 v10 h-30 z M60,40 h40 v10 h-40 z M0,70 h30 v30 h-30 z M10,80 h10 v10 h-10 z M40,60 h20 v40 h-20 z M70,70 h20 v10 h-20 z M90,90 h10 v10 h-10 z" fill="#059669" />
+                  </svg>
+                </div>
+
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '12px', color: '#166534', fontWeight: '700', marginBottom: '4px' }}>
+                    UPI ID: <span style={{ color: '#0f172a', fontFamily: 'monospace' }}>freshbasket@okicici</span>
+                  </div>
+                  <div style={{ fontSize: '11px', color: '#475569', marginBottom: '8px' }}>
+                    Supported Apps: <strong>Google Pay, PhonePe, Paytm, BHIM</strong>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Enter your VPA/UPI ID (e.g. name@upi)"
+                    value={upiId}
+                    onChange={(e) => setUpiId(e.target.value)}
+                    style={{ width: '100%', padding: '6px 10px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '12px' }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {deliveryType === 'Card' && (
+            <div style={{ backgroundColor: '#f8fafc', border: '1.5px solid #e2e8f0', padding: '16px', borderRadius: '16px', marginBottom: '20px' }}>
+              <div style={{ fontSize: '13px', fontWeight: '800', color: '#0f172a', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <CreditCard size={18} style={{ color: '#4f46e5' }} /> Enter Card Details
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>Card Number</label>
+                  <input
+                    type="text"
+                    maxLength={19}
+                    placeholder="4532 •••• •••• 8921"
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(e.target.value)}
+                    style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none' }}
+                  />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>Expiry (MM/YY)</label>
+                    <input
+                      type="text"
+                      maxLength={5}
+                      placeholder="08/28"
+                      value={cardExpiry}
+                      onChange={(e) => setCardExpiry(e.target.value)}
+                      style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: '700', color: '#475569', marginBottom: '4px' }}>CVV</label>
+                    <input
+                      type="password"
+                      maxLength={4}
+                      placeholder="•••"
+                      value={cardCvv}
+                      onChange={(e) => setCardCvv(e.target.value)}
+                      style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none' }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Customer Details */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
@@ -189,12 +330,12 @@ export default function CheckoutModal({
 
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#475569', marginBottom: '6px' }}>
-                Phone Number
+                Phone Number (+91)
               </label>
               <div style={{ position: 'relative' }}>
                 <Phone size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                 <input
-                  type="text"
+                  type="tel"
                   required
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
@@ -204,55 +345,48 @@ export default function CheckoutModal({
             </div>
           </div>
 
-          {/* Delivery Address (If COD) */}
-          {deliveryType === 'COD' && (
+          {/* Delivery Address */}
+          {deliveryType !== 'Pickup' && (
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#475569', marginBottom: '6px' }}>
-                Delivery Street Address
+                Delivery Address
               </label>
               <div style={{ position: 'relative' }}>
-                <MapPin size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                <input
-                  type="text"
+                <MapPin size={15} style={{ position: 'absolute', left: '12px', top: '14px', color: '#94a3b8' }} />
+                <textarea
                   required
+                  rows={2}
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  style={{ width: '100%', padding: '10px 12px 10px 36px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none' }}
+                  style={{ width: '100%', padding: '10px 12px 10px 36px', borderRadius: '10px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none', fontFamily: 'inherit' }}
                 />
               </div>
             </div>
           )}
 
-          {/* Payment Note & Total Box */}
-          <div style={{
-            backgroundColor: '#f8fafc',
-            borderRadius: '12px',
-            padding: '16px',
-            marginBottom: '20px',
-            border: '1px solid #e2e8f0'
-          }}>
+          {/* Order Bill Summary Box */}
+          <div style={{ backgroundColor: '#f8fafc', padding: '16px', borderRadius: '12px', marginBottom: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#64748b', marginBottom: '6px' }}>
-              <span>Items Subtotal ({cartItems.length})</span>
-              <span style={{ fontWeight: '700', color: '#0f172a' }}>₹{subtotal.toFixed(0)}</span>
+              <span>Items Total ({cartItems.reduce((acc, i) => acc + i.quantity, 0)})</span>
+              <span style={{ fontWeight: '700', color: '#0f172a' }}>₹{subtotal.toFixed(2)}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#64748b', marginBottom: '10px' }}>
-              <span>GST / Tax (5%)</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#64748b', marginBottom: '8px' }}>
+              <span>GST Tax (5%)</span>
               <span style={{ fontWeight: '700', color: '#0f172a' }}>₹{tax.toFixed(2)}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: '800', color: '#0f172a', paddingTop: '10px', borderTop: '1px dashed #cbd5e1' }}>
-              <span>Order Total</span>
-              <span style={{ color: '#059669' }}>₹{total.toFixed(2)}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: '800', color: '#059669', paddingTop: '8px', borderTop: '1px dashed #cbd5e1' }}>
+              <span>Total Payable</span>
+              <span>₹{total.toFixed(2)}</span>
             </div>
           </div>
 
-          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
             className="btn btn-primary"
-            style={{ width: '100%', padding: '14px', fontSize: '15px' }}
+            style={{ width: '100%', padding: '14px', fontSize: '16px', borderRadius: '12px' }}
           >
-            {loading ? 'Processing Stock & Order...' : `Confirm & Place Order (₹${total.toFixed(2)})`}
+            {loading ? 'Processing Order...' : `Pay ₹${total.toFixed(2)} & Place Order`}
           </button>
         </form>
       </div>
