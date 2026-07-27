@@ -466,30 +466,32 @@ export default function CheckoutModal({
 
           <button
             type="submit"
-            disabled={loading || ((deliveryType === 'UPI' || deliveryType === 'Card') && !hasCompletedOnlinePayment)}
+            disabled={loading || (deliveryType === 'UPI' && (!isValidUtr || !hasCompletedOnlinePayment))}
             className="btn btn-primary"
             style={{
               width: '100%',
               padding: '14px',
-              fontSize: '15px',
+              fontSize: '14px',
               borderRadius: '12px',
-              backgroundColor: (deliveryType === 'UPI' || deliveryType === 'Card')
-                ? (hasCompletedOnlinePayment ? '#059669' : '#94a3b8')
-                : '#0f172a',
-              borderColor: (deliveryType === 'UPI' || deliveryType === 'Card')
-                ? (hasCompletedOnlinePayment ? '#059669' : '#94a3b8')
-                : '#0f172a',
-              cursor: ((deliveryType === 'UPI' || deliveryType === 'Card') && !hasCompletedOnlinePayment) ? 'not-allowed' : 'pointer',
+              backgroundColor: deliveryType === 'UPI'
+                ? (isValidUtr && hasCompletedOnlinePayment ? '#0284c7' : '#94a3b8')
+                : deliveryType === 'Card' ? '#059669' : '#0f172a',
+              borderColor: deliveryType === 'UPI'
+                ? (isValidUtr && hasCompletedOnlinePayment ? '#0284c7' : '#94a3b8')
+                : deliveryType === 'Card' ? '#059669' : '#0f172a',
+              cursor: (deliveryType === 'UPI' && (!isValidUtr || !hasCompletedOnlinePayment)) ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s'
             }}
           >
             {loading
               ? 'Processing Order...'
-              : (deliveryType === 'UPI' || deliveryType === 'Card')
-                ? (hasCompletedOnlinePayment
-                    ? `✓ Payment Paid (₹${total.toFixed(2)}) - Submit Order`
-                    : `1. Scan & Confirm Payment Above ⬆`)
-                : `Place Order (₹${total.toFixed(2)})`}
+              : deliveryType === 'UPI'
+                ? (isValidUtr && hasCompletedOnlinePayment
+                    ? `Submit Order (UTR #${utrNumber} Attached for Bank Verification)`
+                    : `1. Enter 12-Digit Transaction UTR Above ⬆`)
+                : deliveryType === 'Card'
+                  ? `✓ Payment Paid (₹${total.toFixed(2)}) - Submit Order`
+                  : `Place Order (₹${total.toFixed(2)})`}
           </button>
         </form>
       </div>
