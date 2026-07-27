@@ -6,6 +6,9 @@ const CATEGORIES = ["All", "Produce", "Dairy & Eggs", "Bakery", "Beverages", "Sn
 
 export default function ProductGrid({
   products,
+  loading,
+  error,
+  onRetry,
   selectedCategory,
   setSelectedCategory,
   showLowStockOnly,
@@ -125,8 +128,25 @@ export default function ProductGrid({
         </label>
       </div>
 
-      {/* Product Grid */}
-      {products.length === 0 ? (
+      {/* Product Grid / Loading / Error States */}
+      {loading ? (
+        <div className="glass-card" style={{ textAlign: 'center', padding: '60px 20px', borderRadius: '20px', color: '#059669' }}>
+          <Sparkles size={40} className="animate-fade-in" style={{ marginBottom: '16px' }} />
+          <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a', marginBottom: '8px' }}>Loading Fresh Groceries...</h3>
+          <p style={{ fontSize: '14px', color: '#64748b' }}>Connecting to inventory database...</p>
+        </div>
+      ) : error ? (
+        <div className="glass-card" style={{ textAlign: 'center', padding: '50px 20px', borderRadius: '20px', color: '#b45309', border: '1.5px solid #f59e0b' }}>
+          <AlertTriangle size={48} style={{ color: '#f59e0b', marginBottom: '16px' }} />
+          <h3 style={{ fontSize: '18px', fontWeight: '800', color: '#0f172a', marginBottom: '8px' }}>Backend Server Waking Up</h3>
+          <p style={{ fontSize: '14px', maxWidth: '440px', margin: '0 auto 16px auto', color: '#64748b' }}>
+            {error}
+          </p>
+          <button onClick={onRetry} className="btn btn-primary" style={{ padding: '10px 20px' }}>
+            <Sparkles size={16} /> Retry Loading Products
+          </button>
+        </div>
+      ) : products.length === 0 ? (
         <div className="glass-card" style={{
           textAlign: 'center',
           padding: '60px 20px',

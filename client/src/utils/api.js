@@ -1,15 +1,26 @@
 const API_BASE = import.meta.env.VITE_API_BASE ||
   (import.meta.env.DEV ? 'http://localhost:5000/api' : 'https://grocery-shop-backend-2q5y.onrender.com/api');
 
-export const fetchProducts = async (filters = {}) => {
+export const fetchProducts = async (filters = {}, retries = 2) => {
   const params = new URLSearchParams();
   if (filters.category && filters.category !== 'All') params.append('category', filters.category);
   if (filters.search) params.append('search', filters.search);
   if (filters.low_stock) params.append('low_stock', 'true');
 
-  const res = await fetch(`${API_BASE}/products?${params.toString()}`);
-  if (!res.ok) throw new Error('Failed to fetch products');
-  return res.json();
+  const url = `${API_BASE}/products?${params.toString()}`;
+  console.log(`🛒 [API] Fetching products from: ${url}`);
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+      return await res.json();
+    } catch (err) {
+      console.warn(`[API] Fetch attempt ${attempt + 1} failed:`, err);
+      if (attempt === retries) throw err;
+      await new Promise((r) => setTimeout(r, 2000)); // wait 2s for Render cold start
+    }
+  }
 };
 
 export const createProduct = async (productData) => {

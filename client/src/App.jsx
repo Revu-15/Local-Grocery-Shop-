@@ -50,9 +50,12 @@ export default function App() {
     }
   }, [selectedCategory, showLowStockOnly, searchQuery, activeTab]);
 
+  const [error, setError] = useState(null);
+
   const loadProducts = async () => {
     try {
       setLoading(true);
+      setError(null);
       const data = await fetchProducts({
         category: selectedCategory,
         search: searchQuery,
@@ -61,6 +64,7 @@ export default function App() {
       setProducts(data);
     } catch (err) {
       console.error('Failed to load products:', err);
+      setError('Unable to connect to the backend server. The server may be starting up. Please click retry below.');
     } finally {
       setLoading(false);
     }
@@ -131,6 +135,9 @@ export default function App() {
           activeTab === 'shop' ? (
             <ProductGrid
               products={products}
+              loading={loading}
+              error={error}
+              onRetry={loadProducts}
               selectedCategory={selectedCategory}
               setSelectedCategory={setSelectedCategory}
               showLowStockOnly={showLowStockOnly}
