@@ -151,6 +151,35 @@ export default function UserAuthModal({ isOpen, onClose, user, onSaveUser, onSig
       zIndex: 1000,
       padding: '20px'
     }}>
+      {/* Floating SMS Notification Popup Toast */}
+      {signUpStep === 'OTP' && generatedOtp && (
+        <div style={{
+          position: 'fixed',
+          top: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          zIndex: 9999,
+          backgroundColor: '#0f172a',
+          color: '#fff',
+          padding: '14px 20px',
+          borderRadius: '16px',
+          boxShadow: '0 20px 25px -5px rgba(0,0,0,0.4)',
+          border: '2px solid #10b981',
+          maxWidth: '440px',
+          width: '90%'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+            <div style={{ fontSize: '11px', fontWeight: '800', color: '#34d399', textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              💬 SIMULATED SMS & EMAIL NOTIFICATION
+            </div>
+            <span style={{ fontSize: '10px', color: '#94a3b8' }}>+91 {signUpData.phone}</span>
+          </div>
+          <div style={{ fontSize: '13px', fontWeight: '700', color: '#f8fafc', lineHeight: '1.4' }}>
+            Your FreshBasket verification OTP code is <span style={{ color: '#34d399', fontSize: '16px', fontWeight: '900', fontFamily: 'monospace', backgroundColor: '#064e3b', padding: '2px 8px', borderRadius: '6px' }}>{generatedOtp}</span>. Do not share it.
+          </div>
+        </div>
+      )}
+
       <div className="glass-card animate-fade-in" style={{
         width: '100%',
         maxWidth: '460px',
