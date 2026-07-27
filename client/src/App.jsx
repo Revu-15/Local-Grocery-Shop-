@@ -7,13 +7,33 @@ import ReceiptModal from './components/ReceiptModal';
 import OrderHistory from './components/OrderHistory';
 import AdminDashboard from './components/AdminDashboard';
 import AdminInventory from './components/AdminInventory';
-import AdminOrders from './components/AdminOrders';
 import UserAuthModal from './components/UserAuthModal';
+import AdminAuthModal from './components/AdminAuthModal';
 import { fetchProducts, createOrder } from './utils/api';
 
 export default function App() {
   const [role, setRole] = useState('customer'); // 'customer' or 'admin'
   const [activeTab, setActiveTab] = useState('shop'); // 'shop', 'my-orders', 'dashboard', 'inventory', 'orders'
+
+  // Admin PIN Protection State
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [isAdminPinModalOpen, setIsAdminPinModalOpen] = useState(false);
+
+  const handleRequestAdminAccess = () => {
+    if (isAdminAuthenticated) {
+      setRole('admin');
+      setActiveTab('dashboard');
+    } else {
+      setIsAdminPinModalOpen(true);
+    }
+  };
+
+  const handleAdminAuthSuccess = () => {
+    setIsAdminAuthenticated(true);
+    setIsAdminPinModalOpen(false);
+    setRole('admin');
+    setActiveTab('dashboard');
+  };
 
   // Logged-in Customer Profile State
   const [user, setUser] = useState(() => {
@@ -161,6 +181,13 @@ export default function App() {
         setIsCartOpen={setIsCartOpen}
         user={user}
         onOpenAuthModal={() => setIsAuthModalOpen(true)}
+        onRequestAdminAccess={handleRequestAdminAccess}
+        isAdminAuthenticated={isAdminAuthenticated}
+        onLockAdmin={() => {
+          setIsAdminAuthenticated(false);
+          setRole('customer');
+          setActiveTab('shop');
+        }}
       />
 
       {/* Main Content Area */}
@@ -222,6 +249,13 @@ export default function App() {
         onClose={() => setIsAuthModalOpen(false)}
         user={user}
         onSaveUser={handleSaveUser}
+      />
+
+      {/* Admin Password Authentication Modal */}
+      <AdminAuthModal
+        isOpen={isAdminPinModalOpen}
+        onClose={() => setIsAdminPinModalOpen(false)}
+        onSuccess={handleAdminAuthSuccess}
       />
 
       {/* Printable Receipt Modal */}

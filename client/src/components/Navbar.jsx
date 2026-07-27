@@ -25,7 +25,10 @@ export default function Navbar({
   cartCount,
   setIsCartOpen,
   user,
-  onOpenAuthModal
+  onOpenAuthModal,
+  onRequestAdminAccess,
+  isAdminAuthenticated,
+  onLockAdmin
 }) {
   return (
     <header style={{
@@ -231,7 +234,8 @@ export default function Navbar({
               <UserCheck size={14} /> {user?.name ? `👤 ${user.name}` : 'Customer Login'}
             </button>
             <button
-              onClick={() => { setRole('admin'); setActiveTab('dashboard'); }}
+              onClick={onRequestAdminAccess}
+              title={isAdminAuthenticated ? "Store Manager Admin Panel" : "Click to enter Admin PIN password"}
               style={{
                 padding: '6px 14px',
                 borderRadius: '9999px',
@@ -248,9 +252,21 @@ export default function Navbar({
                 transition: 'all 0.2s'
               }}
             >
-              <PackageCheck size={14} /> Admin
+              <PackageCheck size={14} /> {isAdminAuthenticated ? 'Admin Panel (Unlocked)' : '🔒 Admin Login'}
             </button>
           </div>
+
+          {/* Exit Admin Button when in Admin Mode */}
+          {role === 'admin' && (
+            <button
+              onClick={onLockAdmin}
+              className="btn btn-secondary"
+              style={{ padding: '6px 12px', fontSize: '12px', color: '#dc2626', borderColor: '#fecaca', backgroundColor: '#fef2f2' }}
+              title="Lock Admin Panel & return to Customer view"
+            >
+              🔒 Exit Admin
+            </button>
+          )}
 
           {/* GitHub Repository Link */}
           <a
