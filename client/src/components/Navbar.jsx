@@ -11,7 +11,8 @@ import {
   ClipboardList,
   History,
   Sparkles,
-  Github
+  Github,
+  User
 } from 'lucide-react';
 
 export default function Navbar({
@@ -22,7 +23,9 @@ export default function Navbar({
   searchQuery,
   setSearchQuery,
   cartCount,
-  setIsCartOpen
+  setIsCartOpen,
+  user,
+  onOpenAuthModal
 }) {
   return (
     <header style={{
@@ -169,6 +172,26 @@ export default function Navbar({
                   {cartCount}
                 </span>
               )}
+            </button>
+          {/* Customer Profile / Login Button */}
+          {role === 'customer' && (
+            <button
+              onClick={onOpenAuthModal}
+              className="btn btn-secondary"
+              style={{
+                padding: '8px 14px',
+                fontSize: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                backgroundColor: '#ecfdf5',
+                borderColor: '#a7f3d0',
+                color: '#047857'
+              }}
+              title="Click to change username, email, phone or delivery address"
+            >
+              <User size={15} />
+              <span style={{ fontWeight: '700' }}>{user?.name || 'Login'}</span>
             </button>
           )}
 

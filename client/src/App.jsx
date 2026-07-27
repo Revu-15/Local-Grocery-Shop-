@@ -8,11 +8,43 @@ import OrderHistory from './components/OrderHistory';
 import AdminDashboard from './components/AdminDashboard';
 import AdminInventory from './components/AdminInventory';
 import AdminOrders from './components/AdminOrders';
+import UserAuthModal from './components/UserAuthModal';
 import { fetchProducts, createOrder } from './utils/api';
 
 export default function App() {
   const [role, setRole] = useState('customer'); // 'customer' or 'admin'
   const [activeTab, setActiveTab] = useState('shop'); // 'shop', 'my-orders', 'dashboard', 'inventory', 'orders'
+
+  // Logged-in Customer Profile State
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lgs_user');
+      return saved ? JSON.parse(saved) : {
+        name: 'Rahul Sharma',
+        email: 'rahul.sharma@gmail.com',
+        phone: '9876543210',
+        address: '100 Feet Road, Indiranagar, Bengaluru'
+      };
+    } catch {
+      return {
+        name: 'Rahul Sharma',
+        email: 'rahul.sharma@gmail.com',
+        phone: '9876543210',
+        address: '100 Feet Road, Indiranagar, Bengaluru'
+      };
+    }
+  });
+
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const handleSaveUser = (updatedUser) => {
+    setUser(updatedUser);
+    try {
+      localStorage.setItem('lgs_user', JSON.stringify(updatedUser));
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -127,6 +159,8 @@ export default function App() {
         setSearchQuery={setSearchQuery}
         cartCount={cartItems.reduce((acc, i) => acc + i.quantity, 0)}
         setIsCartOpen={setIsCartOpen}
+        user={user}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -179,6 +213,15 @@ export default function App() {
         onClose={() => setIsCheckoutOpen(false)}
         cartItems={cartItems}
         onOrderSuccess={handleOrderSuccess}
+        user={user}
+      />
+
+      {/* User Login & Profile Modal */}
+      <UserAuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        user={user}
+        onSaveUser={handleSaveUser}
       />
 
       {/* Printable Receipt Modal */}

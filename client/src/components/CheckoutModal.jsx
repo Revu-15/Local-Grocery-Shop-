@@ -5,14 +5,15 @@ export default function CheckoutModal({
   isOpen,
   onClose,
   cartItems,
-  onOrderSuccess
+  onOrderSuccess,
+  user
 }) {
   if (!isOpen) return null;
 
-  const [customerName, setCustomerName] = useState('Rahul Sharma');
-  const [customerPhone, setCustomerPhone] = useState('+91 98765 43210');
+  const [customerName, setCustomerName] = useState(user?.name || 'Rahul Sharma');
+  const [customerPhone, setCustomerPhone] = useState(user?.phone || '9876543210');
   const [deliveryType, setDeliveryType] = useState('COD'); // 'COD' or 'Pickup'
-  const [address, setAddress] = useState('12 MG Road, Indiranagar, Bengaluru');
+  const [address, setAddress] = useState(user?.address || '12 MG Road, Indiranagar, Bengaluru');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
