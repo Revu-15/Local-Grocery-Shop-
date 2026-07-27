@@ -4,8 +4,34 @@ import { X, Printer, CheckCircle, ShoppingBag, Truck, Store, Calendar, User, Pho
 export default function ReceiptModal({ order, onClose }) {
   if (!order) return null;
 
-  const handlePrint = () => {
-    window.print();
+  const handleDownload = () => {
+    const element = document.getElementById('printable-receipt');
+    if (!element) return;
+    const content = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Receipt - Order #${order.order_number}</title>
+        <style>
+          body { font-family: monospace, sans-serif; padding: 20px; color: #0f172a; max-width: 600px; margin: 0 auto; }
+          h2 { color: #059669; }
+          table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+          th, td { padding: 8px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+          th { background: #f8fafc; }
+        </style>
+      </head>
+      <body>
+        ${element.innerHTML}
+      </body>
+      </html>
+    `;
+    const blob = new Blob([content], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Receipt-${order.order_number}.html`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -48,8 +74,17 @@ export default function ReceiptModal({ order, onClose }) {
               onClick={handlePrint}
               className="btn btn-primary"
               style={{ padding: '6px 12px', fontSize: '13px' }}
+              title="Print directly or Save as PDF"
             >
-              <Printer size={15} /> Print / PDF
+              <Printer size={15} /> Print Receipt
+            </button>
+            <button
+              onClick={handleDownload}
+              className="btn btn-secondary"
+              style={{ padding: '6px 12px', fontSize: '13px', backgroundColor: '#eff6ff', color: '#2563eb', borderColor: '#bfdbfe' }}
+              title="Download Receipt HTML file"
+            >
+              📥 Download
             </button>
             <button
               onClick={onClose}

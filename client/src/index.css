@@ -150,25 +150,67 @@ body {
   animation: fadeIn 0.3s ease-out forwards;
 }
 
-/* Print Styles for Receipts */
+/* Print Styles for Receipts - Ensures single 1-page clean receipt without blank pages */
 @media print {
-  body * {
-    visibility: hidden;
+  /* Hide all background website elements completely */
+  header,
+  main,
+  footer,
+  .no-print,
+  #root > div > header,
+  #root > div > main,
+  #root > div > footer {
+    display: none !important;
   }
-  #printable-receipt, #printable-receipt * {
-    visibility: visible;
+
+  body {
+    background-color: #fff !important;
+    color: #000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
-  #printable-receipt {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    margin: 0;
-    padding: 20px;
+
+  /* Make receipt modal container full width and static in print flow */
+  div[style*="position: fixed"],
+  div[style*="position:fixed"] {
+    position: static !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .glass-card {
     box-shadow: none !important;
     border: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
-  .no-print {
-    display: none !important;
+
+  #printable-receipt {
+    display: block !important;
+    visibility: visible !important;
+    position: static !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 10px !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    font-size: 11pt !important;
+    color: #000 !important;
+  }
+
+  #printable-receipt * {
+    visibility: visible !important;
+    color: #000 !important;
+  }
+
+  @page {
+    size: auto;
+    margin: 10mm;
   }
 }
