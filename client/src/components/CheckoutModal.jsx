@@ -56,7 +56,7 @@ export default function CheckoutModal({
         customer_name: customerName,
         customer_phone: customerPhone,
         delivery_type: deliveryType === 'UPI' ? 'UPI (Online)' : deliveryType === 'Card' ? 'Card (Online)' : deliveryType === 'Pickup' ? 'In-Store Pickup' : 'Cash on Delivery',
-        payment_status: isOnlinePaid ? 'Paid' : 'Pending COD',
+        payment_status: deliveryType === 'UPI' ? 'UPI Pending Verification' : deliveryType === 'Card' ? 'Paid' : 'Pending COD',
         transaction_ref: deliveryType === 'UPI' ? `UTR: ${utrNumber}` : (cardNumber ? `CARD: ****${cardNumber.slice(-4)}` : 'N/A'),
         address: deliveryType === 'Pickup' ? 'In-Store Pickup Counter' : address,
         items: cartItems.map((item) => ({
@@ -310,12 +310,12 @@ export default function CheckoutModal({
                 />
                 <div style={{ fontSize: '11px', marginTop: '6px', fontWeight: '700', color: isValidUtr ? '#059669' : '#dc2626' }}>
                   {isValidUtr
-                    ? '✓ Match Confirmed! Valid 12-Digit PhonePe / UPI UTR Format'
-                    : `⚠️ Enter exact 12-digit numeric PhonePe UTR No. from app receipt`}
+                    ? `✓ 12-Digit UTR Submitted (${utrNumber}) — Store owner will verify in bank app upon order arrival`
+                    : `⚠️ Enter exact 12-digit numeric PhonePe UTR No. from your payment receipt`}
                 </div>
               </div>
 
-              {/* Payment Verification Checkbox - Enabled ONLY after entering exact 12-digit UTR */}
+              {/* Payment Verification Checkbox */}
               <label style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -341,8 +341,8 @@ export default function CheckoutModal({
                 />
                 <span>
                   {(isValidUtr && hasCompletedOnlinePayment)
-                    ? `✓ PhonePe UTR Verified & Tick Marked (${utrNumber})`
-                    : 'Enter exact 12-digit PhonePe UTR No. above to unlock tick mark'}
+                    ? `✓ I confirm I paid ₹${total.toFixed(2)} via UPI (UTR: ${utrNumber})`
+                    : 'Enter exact 12-digit PhonePe UTR No. above to unlock check mark'}
                 </span>
               </label>
             </div>
