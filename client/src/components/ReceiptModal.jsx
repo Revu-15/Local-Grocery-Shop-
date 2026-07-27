@@ -4,6 +4,52 @@ import { X, Printer, CheckCircle, ShoppingBag, Truck, Store, Calendar, User, Pho
 export default function ReceiptModal({ order, onClose }) {
   if (!order) return null;
 
+  const handlePrint = () => {
+    const element = document.getElementById('printable-receipt');
+    if (!element) return;
+
+    const printWin = window.open('', '_blank', 'width=650,height=800');
+    if (!printWin) {
+      window.print();
+      return;
+    }
+
+    printWin.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Receipt #${order.order_number}</title>
+        <style>
+          * { box-sizing: border-box; }
+          body {
+            font-family: 'Courier New', Courier, monospace, sans-serif;
+            padding: 24px;
+            margin: 0;
+            color: #0f172a;
+            background: #fff;
+          }
+          h2 { color: #059669; font-family: sans-serif; margin: 0 0 4px 0; }
+          table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 13px; }
+          th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+          th { background: #f8fafc; font-weight: bold; }
+          .no-print { display: none !important; }
+          @page { size: auto; margin: 10mm; }
+        </style>
+      </head>
+      <body>
+        ${element.innerHTML}
+      </body>
+      </html>
+    `);
+
+    printWin.document.close();
+    printWin.focus();
+    setTimeout(() => {
+      printWin.print();
+      printWin.close();
+    }, 300);
+  };
+
   const handleDownload = () => {
     const element = document.getElementById('printable-receipt');
     if (!element) return;
