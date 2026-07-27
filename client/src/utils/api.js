@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE ||
+  (import.meta.env.DEV ? 'http://localhost:5000/api' : 'https://grocery-shop-backend-2q5y.onrender.com/api');
 
 export const fetchProducts = async (filters = {}) => {
   const params = new URLSearchParams();
