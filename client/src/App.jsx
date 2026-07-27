@@ -57,6 +57,22 @@ export default function App() {
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
+  const handleSignOut = () => {
+    const freshUser = {
+      id: 'USER-' + Date.now().toString().slice(-6),
+      name: 'Guest Customer',
+      email: '',
+      phone: '',
+      address: ''
+    };
+    setUser(freshUser);
+    try {
+      localStorage.removeItem('lgs_user');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const handleSaveUser = (updatedUser) => {
     setUser(updatedUser);
     try {
@@ -249,6 +265,7 @@ export default function App() {
         onClose={() => setIsAuthModalOpen(false)}
         user={user}
         onSaveUser={handleSaveUser}
+        onSignOut={handleSignOut}
       />
 
       {/* Admin Password Authentication Modal */}
