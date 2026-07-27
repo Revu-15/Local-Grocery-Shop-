@@ -21,7 +21,7 @@ A full-stack, enterprise-grade **Local Grocery Shop Web Application** built with
 ## ✨ Comprehensive Feature Suite
 
 ### 1. 📲 Verified Customer Authentication & SMS/Email OTP Engine
-- **SMS & Email OTP Registration**: When signing up, a **6-Digit OTP Code** is dispatched to the user's mobile number (*e.g., +91 9392652834*) and email (*e.g., revanth.polamreddy@gmail.com*).
+- **SMS & Email OTP Registration**: When signing up, a **6-Digit OTP Code** is dispatched to the user's mobile number (*e.g., +91 9876543210*) and email (*e.g., customer@example.com*).
 - **Master Test OTP Support (`123456`)**: Supports `123456` as a master fallback OTP for instant testing.
 - **1-Click SMS Helper**: Includes a **`📩 Didn't receive SMS? Click to view/auto-fill OTP`** fallback for zero friction.
 - **Strict Registered Account Security**: Only registered users with verified phone/email and correct passwords can sign in. Unregistered logins are blocked with clear error alerts.

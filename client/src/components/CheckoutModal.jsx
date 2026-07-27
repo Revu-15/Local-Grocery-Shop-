@@ -248,7 +248,7 @@ export default function CheckoutModal({
               {/* Large Dynamic Real Scannable UPI QR Code Scanner Box */}
               <div style={{ width: '160px', height: '160px', backgroundColor: '#fff', padding: '10px', borderRadius: '16px', border: '2px solid #059669', margin: '0 auto 14px auto', boxShadow: '0 4px 12px rgba(5,150,105,0.15)' }}>
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=polamreddyrevanth.82@oksbi&pn=FreshBasket%20Grocery&am=${total}&cu=INR`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(`upi://pay?pa=freshbasket@oksbi&pn=FreshBasket%20Grocery&am=${total}&cu=INR`)}`}
                   alt="Scan UPI QR Code to Pay"
                   style={{ width: '100%', height: '100%', borderRadius: '8px' }}
                 />
@@ -263,7 +263,7 @@ export default function CheckoutModal({
 
               <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <a
-                  href={`upi://pay?pa=polamreddyrevanth.82@oksbi&pn=FreshBasket%20Grocery&am=${total}&cu=INR`}
+                  href={`upi://pay?pa=freshbasket@oksbi&pn=FreshBasket%20Grocery&am=${total}&cu=INR`}
                   style={{ padding: '8px 16px', fontSize: '12px', fontWeight: '800', backgroundColor: '#0f172a', color: '#fff', borderRadius: '10px', textDecoration: 'none', display: 'inline-block' }}
                 >
                   📲 Tap to Open Mobile UPI App
