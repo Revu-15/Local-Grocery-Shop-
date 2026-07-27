@@ -87,7 +87,6 @@ export default function ProductGrid({
               style={{
                 padding: '8px 18px',
                 borderRadius: '9999px',
-                border: 'none',
                 fontSize: '14px',
                 fontWeight: '700',
                 cursor: 'pointer',

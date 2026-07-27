@@ -88,7 +88,6 @@ export default function AdminInventory({ searchQuery, setSearchQuery }) {
               style={{
                 padding: '6px 14px',
                 borderRadius: '9999px',
-                border: 'none',
                 fontSize: '13px',
                 fontWeight: '700',
                 cursor: 'pointer',

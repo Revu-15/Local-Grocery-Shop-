@@ -176,6 +176,8 @@ export default function Navbar({
                 </span>
               )}
             </button>
+          )}
+
           {/* Customer Profile / Login Button */}
           {role === 'customer' && (
             <button
