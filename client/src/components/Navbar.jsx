@@ -196,77 +196,46 @@ export default function Navbar({
               title="Click to change username, email, phone or delivery address"
             >
               <User size={15} />
-              <span style={{ fontWeight: '700' }}>{user?.name || 'Login'}</span>
+              <span style={{ fontWeight: '700' }}>{user?.name || 'Customer Login'}</span>
             </button>
           )}
 
-          {/* User Role Switcher Pill */}
-          <div style={{
-            display: 'inline-flex',
-            padding: '3px',
-            backgroundColor: '#e2e8f0',
-            borderRadius: '9999px'
-          }}>
-            <button
-              onClick={() => {
-                if (role === 'customer') {
-                  onOpenAuthModal();
-                } else {
-                  setRole('customer');
-                  setActiveTab('shop');
-                }
-              }}
-              title="Click to switch to customer view or edit login profile"
-              style={{
-                padding: '6px 14px',
-                borderRadius: '9999px',
-                border: 'none',
-                fontSize: '13px',
-                fontWeight: '700',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                backgroundColor: role === 'customer' ? '#fff' : 'transparent',
-                color: role === 'customer' ? '#059669' : '#64748b',
-                boxShadow: role === 'customer' ? '0 2px 6px rgba(0,0,0,0.1)' : 'none',
-                transition: 'all 0.2s'
-              }}
-            >
-              <UserCheck size={14} /> {user?.name ? `👤 ${user.name}` : 'Customer Login'}
-            </button>
+          {/* Admin Owner Controls - Shown ONLY when Unlocked or via Secret Owner Trigger */}
+          {isAdminAuthenticated ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                onClick={() => { setRole('admin'); setActiveTab('dashboard'); }}
+                className="btn btn-primary"
+                style={{ padding: '6px 14px', fontSize: '13px', backgroundColor: '#0f172a', borderColor: '#0f172a' }}
+              >
+                <PackageCheck size={14} /> Admin Dashboard
+              </button>
+              <button
+                onClick={onLockAdmin}
+                className="btn btn-secondary"
+                style={{ padding: '6px 12px', fontSize: '12px', color: '#dc2626', borderColor: '#fecaca', backgroundColor: '#fef2f2' }}
+                title="Lock Admin Panel & return to Customer view"
+              >
+                🔒 Exit Admin
+              </button>
+            </div>
+          ) : (
+            /* Discrete Secret Store Owner Button */
             <button
               onClick={onRequestAdminAccess}
-              title={isAdminAuthenticated ? "Store Manager Admin Panel" : "Click to enter Admin PIN password"}
               style={{
-                padding: '6px 14px',
-                borderRadius: '9999px',
+                background: 'none',
                 border: 'none',
-                fontSize: '13px',
-                fontWeight: '700',
+                color: '#94a3b8',
                 cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                backgroundColor: role === 'admin' ? '#0f172a' : 'transparent',
-                color: role === 'admin' ? '#fff' : '#64748b',
-                boxShadow: role === 'admin' ? '0 2px 6px rgba(0,0,0,0.15)' : 'none',
-                transition: 'all 0.2s'
+                padding: '4px 8px',
+                fontSize: '12px',
+                opacity: 0.7,
+                transition: 'opacity 0.2s'
               }}
+              title="Store Manager Login"
             >
-              <PackageCheck size={14} /> {isAdminAuthenticated ? 'Admin Panel (Unlocked)' : '🔒 Admin Login'}
-            </button>
-          </div>
-
-          {/* Exit Admin Button when in Admin Mode */}
-          {role === 'admin' && (
-            <button
-              onClick={onLockAdmin}
-              className="btn btn-secondary"
-              style={{ padding: '6px 12px', fontSize: '12px', color: '#dc2626', borderColor: '#fecaca', backgroundColor: '#fef2f2' }}
-              title="Lock Admin Panel & return to Customer view"
-            >
-              🔒 Exit Admin
+              🔒
             </button>
           )}
 

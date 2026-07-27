@@ -9,13 +9,12 @@ export default function AdminAuthModal({ isOpen, onClose, onSuccess }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Default Admin PIN: 1234 or admin123
-    if (pin === '1234' || pin === 'admin123' || pin === 'admin') {
+    if (pin === '949254') {
       setError('');
       setPin('');
       onSuccess();
     } else {
-      setError('Invalid Admin Security PIN. (Default PIN is 1234)');
+      setError('Invalid Admin Security PIN. Access Denied.');
     }
   };
 
@@ -119,7 +118,7 @@ export default function AdminAuthModal({ isOpen, onClose, onSuccess }) {
                 type="password"
                 required
                 autoFocus
-                placeholder="Enter Admin PIN (Default: 1234)"
+                placeholder="Enter 6-digit Secret Admin PIN"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
                 style={{
@@ -134,7 +133,7 @@ export default function AdminAuthModal({ isOpen, onClose, onSuccess }) {
               />
             </div>
             <div style={{ fontSize: '11px', color: '#64748b', marginTop: '6px' }}>
-              🔑 Store Owner Default Password: <strong style={{ color: '#0f172a' }}>1234</strong>
+              🔒 Protected Store Owner Portal
             </div>
           </div>
 

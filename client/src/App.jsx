@@ -35,6 +35,18 @@ export default function App() {
     setActiveTab('dashboard');
   };
 
+  // Keyboard Shortcut: Ctrl + Shift + A to open Admin PIN prompt
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        handleRequestAdminAccess();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAdminAuthenticated]);
+
   // Logged-in Customer Profile State
   const [user, setUser] = useState(() => {
     try {
