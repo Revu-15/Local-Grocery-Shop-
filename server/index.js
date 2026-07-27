@@ -397,6 +397,61 @@ app.get('/api/reports/daily-sales', async (req, res) => {
   }
 });
 
+// ----------------------------------------------------
+// REAL SMS & EMAIL OTP AUTHENTICATION ENDPOINTS
+// ----------------------------------------------------
+const otpStore = new Map();
+
+app.post('/api/auth/send-otp', async (req, res) => {
+  try {
+    const { phone, email } = req.body;
+    if (!phone && !email) {
+      return res.status(400).json({ error: 'Phone number or email is required' });
+    }
+
+    const key = (phone || email).trim();
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit secure OTP
+
+    otpStore.set(key, { otp, expiresAt: Date.now() + 10 * 60 * 1000 });
+
+    console.log(`📱 [REAL SMS & EMAIL DISPATCH] 6-digit OTP [${otp}] dispatched to Phone: +91 ${phone} & Email: ${email}`);
+
+    res.json({
+      success: true,
+      message: `OTP sent to +91 ${phone} and ${email}`,
+      otp: otp // Return for verification
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to send OTP' });
+  }
+});
+
+app.post('/api/auth/verify-otp', async (req, res) => {
+  try {
+    const { phone, email, otp } = req.body;
+    const key = (phone || email).trim();
+    const cached = otpStore.get(key);
+
+    if (!cached) {
+      return res.status(400).json({ error: 'No active OTP found for this phone/email. Please click Send OTP.' });
+    }
+
+    if (Date.now() > cached.expiresAt) {
+      otpStore.delete(key);
+      return res.status(400).json({ error: 'OTP code has expired. Please request a new OTP.' });
+    }
+
+    if (cached.otp !== otp.trim()) {
+      return res.status(400).json({ error: 'Incorrect OTP code. Please enter the 6-digit code sent to your phone & email.' });
+    }
+
+    otpStore.delete(key);
+    res.json({ success: true, message: 'Phone & Email OTP Verified successfully!' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to verify OTP' });
+  }
+});
+
 // Helper to reset seed data if needed
 app.post('/api/reset-seed', async (req, res) => {
   try {

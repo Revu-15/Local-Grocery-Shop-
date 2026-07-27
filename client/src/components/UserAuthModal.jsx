@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, X, Check, Lock, LogIn, UserPlus, LogOut, ShieldCheck, KeyRound, AlertCircle } from 'lucide-react';
+import { sendAuthOtp, verifyAuthOtp } from '../utils/api';
 
 const LOCAL_USERS_KEY = 'grocery_registered_users';
 
@@ -68,8 +69,8 @@ export default function UserAuthModal({ isOpen, onClose, user, onSaveUser, onSig
     onClose();
   };
 
-  // Step 1: Send SMS/Email OTP
-  const handleSendOtp = (e) => {
+  // Step 1: Send SMS/Email OTP via backend API
+  const handleSendOtp = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
@@ -91,42 +92,46 @@ export default function UserAuthModal({ isOpen, onClose, user, onSaveUser, onSig
       return;
     }
 
-    // Generate 4-digit OTP
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
-    setGeneratedOtp(otp);
-    setSignUpStep('OTP');
+    try {
+      const res = await sendAuthOtp(signUpData.phone, signUpData.email);
+      setGeneratedOtp(res.otp || Math.floor(100000 + Math.random() * 900000).toString());
+      setSignUpStep('OTP');
+    } catch (err) {
+      setErrorMsg(err.message || 'Failed to dispatch OTP to your phone & email.');
+    }
   };
 
-  // Step 2: Verify OTP & Create Account
-  const handleVerifyOtp = (e) => {
+  // Step 2: Verify OTP via backend API & Create Account
+  const handleVerifyOtp = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
-    if (userEnteredOtp.trim() !== generatedOtp) {
-      setErrorMsg('❌ Invalid OTP! Please enter the correct 4-digit verification code.');
-      return;
+    try {
+      await verifyAuthOtp(signUpData.phone, signUpData.email, userEnteredOtp);
+
+      const registered = getRegisteredUsers();
+      const newUser = {
+        id: 'USER-' + Date.now().toString().slice(-6),
+        name: signUpData.name,
+        email: signUpData.email.trim(),
+        phone: signUpData.phone.trim(),
+        password: signUpData.password,
+        address: signUpData.address
+      };
+
+      const updatedUsers = [...registered, newUser];
+      localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(updatedUsers));
+
+      // Pre-fill Sign In form & switch to Sign In mode
+      setSignInEmail(newUser.email);
+      setSignInPassword(newUser.password);
+      setSuccessMsg(`✓ Phone & Email OTP Verified! Account for "${newUser.name}" created. Click Sign In below.`);
+      setAuthMode('signin');
+      setSignUpStep('FORM');
+      setUserEnteredOtp('');
+    } catch (err) {
+      setErrorMsg(err.message || '❌ Invalid 6-digit OTP code!');
     }
-
-    const registered = getRegisteredUsers();
-    const newUser = {
-      id: 'USER-' + Date.now().toString().slice(-6),
-      name: signUpData.name,
-      email: signUpData.email.trim(),
-      phone: signUpData.phone.trim(),
-      password: signUpData.password,
-      address: signUpData.address
-    };
-
-    const updatedUsers = [...registered, newUser];
-    localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(updatedUsers));
-
-    // Pre-fill Sign In form & switch to Sign In mode
-    setSignInEmail(newUser.email);
-    setSignInPassword(newUser.password);
-    setSuccessMsg(`✓ Phone & Email OTP Verified! Account for "${newUser.name}" created. Click Sign In below.`);
-    setAuthMode('signin');
-    setSignUpStep('FORM');
-    setUserEnteredOtp('');
   };
 
   const handleQuickLogin = (demoUser) => {

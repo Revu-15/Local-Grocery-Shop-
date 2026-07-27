@@ -105,6 +105,32 @@ export const updateOrderPaymentStatus = async (id, payment_status) => {
   return res.json();
 };
 
+export const sendAuthOtp = async (phone, email) => {
+  const res = await fetch(`${API_BASE}/auth/send-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone, email })
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Failed to send OTP');
+  }
+  return res.json();
+};
+
+export const verifyAuthOtp = async (phone, email, otp) => {
+  const res = await fetch(`${API_BASE}/auth/verify-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone, email, otp })
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Failed to verify OTP');
+  }
+  return res.json();
+};
+
 export const fetchSalesReport = async () => {
   const res = await fetch(`${API_BASE}/reports/daily-sales`);
   if (!res.ok) throw new Error('Failed to fetch sales report');
