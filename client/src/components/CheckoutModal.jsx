@@ -29,6 +29,8 @@ export default function CheckoutModal({
   const tax = Math.round(subtotal * 0.05 * 100) / 100;
   const total = Math.round((subtotal + tax) * 100) / 100;
 
+  const isValidUtr = /^\d{12}$/.test(utrNumber.trim());
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!customerName || !customerPhone) {
@@ -39,8 +41,8 @@ export default function CheckoutModal({
       setError('Please enter a delivery address.');
       return;
     }
-    if (deliveryType === 'UPI' && (!utrNumber || utrNumber.length < 6)) {
-      setError('Please enter your 12-digit UPI Transaction UTR / Ref Number.');
+    if (deliveryType === 'UPI' && !isValidUtr) {
+      setError('Please enter a valid 12-digit numeric PhonePe / UPI UTR Number (e.g. 429182910481).');
       return;
     }
 
@@ -269,58 +271,78 @@ export default function CheckoutModal({
               </div>
 
               {/* UTR / Transaction Reference Number Input */}
-              <div style={{ marginTop: '14px', textAlign: 'left', backgroundColor: '#fff', padding: '12px', borderRadius: '12px', border: '1px solid #cbd5e1' }}>
-                <label style={{ display: 'block', fontSize: '11.5px', fontWeight: '800', color: '#166534', marginBottom: '4px' }}>
-                  Enter 12-Digit UPI Transaction UTR / Ref No. *
-                </label>
+              <div style={{ marginTop: '14px', textAlign: 'left', backgroundColor: '#fff', padding: '14px', borderRadius: '12px', border: isValidUtr ? '2px solid #059669' : '1.5px solid #cbd5e1' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                  <label style={{ fontSize: '11.5px', fontWeight: '800', color: '#166534' }}>
+                    Enter 12-Digit PhonePe / UPI UTR No. *
+                  </label>
+                  <span style={{ fontSize: '11px', fontWeight: '700', color: isValidUtr ? '#059669' : '#94a3b8' }}>
+                    {utrNumber.length}/12 Digits
+                  </span>
+                </div>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. 429182910481 (from GPay / PhonePe / Paytm)"
+                  maxLength={12}
+                  placeholder="e.g. 429182910481 (Exact 12 Numbers)"
                   value={utrNumber}
                   onChange={(e) => {
-                    setUtrNumber(e.target.value);
-                    if (e.target.value.length >= 6) {
+                    const cleaned = e.target.value.replace(/\D/g, '').slice(0, 12);
+                    setUtrNumber(cleaned);
+                    if (/^\d{12}$/.test(cleaned)) {
                       setHasCompletedOnlinePayment(true);
                     } else {
                       setHasCompletedOnlinePayment(false);
                     }
                   }}
-                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', outline: 'none', fontWeight: '600' }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    border: isValidUtr ? '1.5px solid #059669' : '1px solid #cbd5e1',
+                    fontSize: '15px',
+                    outline: 'none',
+                    fontWeight: '800',
+                    letterSpacing: '2px',
+                    fontFamily: 'monospace',
+                    color: '#0f172a'
+                  }}
                 />
-                <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
-                  Enter UTR/Ref # from your payment app to verify & enable payment tick mark.
+                <div style={{ fontSize: '11px', marginTop: '6px', fontWeight: '700', color: isValidUtr ? '#059669' : '#dc2626' }}>
+                  {isValidUtr
+                    ? '✓ Match Confirmed! Valid 12-Digit PhonePe / UPI UTR Format'
+                    : `⚠️ Enter exact 12-digit numeric PhonePe UTR No. from app receipt`}
                 </div>
               </div>
 
-              {/* Payment Verification Checkbox - Enabled ONLY after entering UTR */}
+              {/* Payment Verification Checkbox - Enabled ONLY after entering exact 12-digit UTR */}
               <label style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '8px',
-                cursor: (!utrNumber || utrNumber.length < 6) ? 'not-allowed' : 'pointer',
+                cursor: !isValidUtr ? 'not-allowed' : 'pointer',
                 marginTop: '12px',
                 fontSize: '13px',
                 fontWeight: '700',
-                color: hasCompletedOnlinePayment ? '#15803d' : '#94a3b8',
-                backgroundColor: hasCompletedOnlinePayment ? '#dcfce7' : '#f8fafc',
+                color: (isValidUtr && hasCompletedOnlinePayment) ? '#15803d' : '#94a3b8',
+                backgroundColor: (isValidUtr && hasCompletedOnlinePayment) ? '#dcfce7' : '#f8fafc',
                 padding: '10px 14px',
                 borderRadius: '10px',
-                border: hasCompletedOnlinePayment ? '1.5px solid #86efac' : '1px solid #e2e8f0',
+                border: (isValidUtr && hasCompletedOnlinePayment) ? '1.5px solid #86efac' : '1px solid #e2e8f0',
                 transition: 'all 0.2s'
               }}>
                 <input
                   type="checkbox"
-                  disabled={!utrNumber || utrNumber.length < 6}
-                  checked={hasCompletedOnlinePayment}
+                  disabled={!isValidUtr}
+                  checked={isValidUtr && hasCompletedOnlinePayment}
                   onChange={(e) => setHasCompletedOnlinePayment(e.target.checked)}
-                  style={{ width: '18px', height: '18px', accentColor: '#059669', cursor: (!utrNumber || utrNumber.length < 6) ? 'not-allowed' : 'pointer' }}
+                  style={{ width: '18px', height: '18px', accentColor: '#059669', cursor: !isValidUtr ? 'not-allowed' : 'pointer' }}
                 />
                 <span>
-                  {hasCompletedOnlinePayment
-                    ? `✓ Payment Verified & Tick Marked (UTR: ${utrNumber})`
-                    : 'Enter UTR / Ref Number above to enable tick mark'}
+                  {(isValidUtr && hasCompletedOnlinePayment)
+                    ? `✓ PhonePe UTR Verified & Tick Marked (${utrNumber})`
+                    : 'Enter exact 12-digit PhonePe UTR No. above to unlock tick mark'}
                 </span>
               </label>
             </div>
