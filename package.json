@@ -1,0 +1,25 @@
+{
+  "name": "local-grocery-shop-fullstack",
+  "version": "1.0.0",
+  "description": "Full-Stack Local Grocery Shop Web Application with Inventory Management, Ordering, Billing Receipts & Analytics",
+  "main": "server/index.js",
+  "type": "module",
+  "scripts": {
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "start": "node server/index.js",
+    "client": "npm run dev --prefix client",
+    "server": "npm run dev --prefix server",
+    "build:client": "npm run build --prefix client"
+  },
+  "keywords": [
+    "grocery-shop",
+    "inventory-management",
+    "pos",
+    "billing",
+    "express",
+    "react",
+    "sqlite"
+  ],
+  "author": "",
+  "license": "ISC"
+}
