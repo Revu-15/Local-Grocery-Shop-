@@ -13,7 +13,6 @@ A full-stack, enterprise-grade **Local Grocery Shop Web Application** built with
 ## 🌐 Live Web Application & Repository Links
 
 - 🛒 **Live Customer Web Store (Primary)**: **[https://local-grocery-shop-wheat.vercel.app](https://local-grocery-shop-wheat.vercel.app)**
-- 🛒 **Live Customer Web Store (Secondary)**: **[https://local-grocery-shop.vercel.app](https://local-grocery-shop.vercel.app)**
 - ⚙️ **Live Backend REST API**: **[https://grocery-shop-backend-2q5y.onrender.com](https://grocery-shop-backend-2q5y.onrender.com)**
 - 🐱 **GitHub Repository**: **[https://github.com/Revu-15/Local-Grocery-Shop-](https://github.com/Revu-15/Local-Grocery-Shop-)**
 
