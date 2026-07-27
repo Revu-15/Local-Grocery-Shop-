@@ -17,11 +17,12 @@ export default function CheckoutModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Online Payment Card Fields
+  // Online Payment Card & Verification Fields
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCvv, setCardCvv] = useState('');
   const [upiId, setUpiId] = useState('rahul@okicici');
+  const [hasCompletedOnlinePayment, setHasCompletedOnlinePayment] = useState(false);
 
   const subtotal = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
   const tax = Math.round(subtotal * 0.05 * 100) / 100;
@@ -252,12 +253,40 @@ export default function CheckoutModal({
                 Open <strong>Google Pay, PhonePe, Paytm, BHIM or any Banking App</strong> & scan this QR code.
               </div>
 
-              <a
-                href={`upi://pay?pa=polamreddyrevanth.82@oksbi&pn=FreshBasket%20Grocery&am=${total}&cu=INR`}
-                style={{ padding: '8px 16px', fontSize: '12px', fontWeight: '800', backgroundColor: '#0f172a', color: '#fff', borderRadius: '10px', textDecoration: 'none', display: 'inline-block' }}
-              >
-                📲 Tap to Open Mobile UPI App
-              </a>
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <a
+                  href={`upi://pay?pa=polamreddyrevanth.82@oksbi&pn=FreshBasket%20Grocery&am=${total}&cu=INR`}
+                  style={{ padding: '8px 16px', fontSize: '12px', fontWeight: '800', backgroundColor: '#0f172a', color: '#fff', borderRadius: '10px', textDecoration: 'none', display: 'inline-block' }}
+                >
+                  📲 Tap to Open Mobile UPI App
+                </a>
+              </div>
+
+              {/* Payment Verification Checkbox */}
+              <label style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                marginTop: '14px',
+                fontSize: '13px',
+                fontWeight: '700',
+                color: hasCompletedOnlinePayment ? '#15803d' : '#475569',
+                backgroundColor: hasCompletedOnlinePayment ? '#dcfce7' : '#fff',
+                padding: '10px 14px',
+                borderRadius: '10px',
+                border: hasCompletedOnlinePayment ? '1.5px solid #86efac' : '1px solid #cbd5e1',
+                transition: 'all 0.2s'
+              }}>
+                <input
+                  type="checkbox"
+                  checked={hasCompletedOnlinePayment}
+                  onChange={(e) => setHasCompletedOnlinePayment(e.target.checked)}
+                  style={{ width: '18px', height: '18px', accentColor: '#059669', cursor: 'pointer' }}
+                />
+                <span>I have completed payment of ₹{total.toFixed(2)} on my UPI app</span>
+              </label>
             </div>
           )}
 
@@ -379,18 +408,30 @@ export default function CheckoutModal({
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || ((deliveryType === 'UPI' || deliveryType === 'Card') && !hasCompletedOnlinePayment)}
             className="btn btn-primary"
             style={{
               width: '100%',
               padding: '14px',
               fontSize: '15px',
               borderRadius: '12px',
-              backgroundColor: (deliveryType === 'UPI' || deliveryType === 'Card') ? '#059669' : '#0f172a',
-              borderColor: (deliveryType === 'UPI' || deliveryType === 'Card') ? '#059669' : '#0f172a'
+              backgroundColor: (deliveryType === 'UPI' || deliveryType === 'Card')
+                ? (hasCompletedOnlinePayment ? '#059669' : '#94a3b8')
+                : '#0f172a',
+              borderColor: (deliveryType === 'UPI' || deliveryType === 'Card')
+                ? (hasCompletedOnlinePayment ? '#059669' : '#94a3b8')
+                : '#0f172a',
+              cursor: ((deliveryType === 'UPI' || deliveryType === 'Card') && !hasCompletedOnlinePayment) ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s'
             }}
           >
-            {loading ? 'Processing Order...' : (deliveryType === 'UPI' || deliveryType === 'Card') ? `✓ Payment Paid (₹${total.toFixed(2)}) - Submit Order` : `Place Order (₹${total.toFixed(2)})`}
+            {loading
+              ? 'Processing Order...'
+              : (deliveryType === 'UPI' || deliveryType === 'Card')
+                ? (hasCompletedOnlinePayment
+                    ? `✓ Payment Paid (₹${total.toFixed(2)}) - Submit Order`
+                    : `1. Scan & Confirm Payment Above ⬆`)
+                : `Place Order (₹${total.toFixed(2)})`}
           </button>
         </form>
       </div>
