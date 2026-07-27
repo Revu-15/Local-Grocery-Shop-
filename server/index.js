@@ -9,6 +9,19 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+// Root health check endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: '🛒 FreshBasket Local Grocery Shop API is Live & Running!',
+    status: 'OK',
+    endpoints: {
+      products: '/api/products',
+      orders: '/api/orders',
+      analytics: '/api/reports/daily-sales'
+    }
+  });
+});
+
 // Initialize database
 await initDatabase();
 
