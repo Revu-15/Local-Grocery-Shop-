@@ -3,7 +3,7 @@
 [![React](https://img.shields.io/badge/Frontend-React_18_(Vite)-61DAFB?logo=react)](https://react.dev/)
 [![Node.js](https://img.shields.io/badge/Backend-Express.js_ESM-339933?logo=nodedotjs)](https://expressjs.com/)
 [![Database](https://img.shields.io/badge/Database-SQLite3-003B57?logo=sqlite)](https://sqlite.org/)
-[![Deployment](https://img.shields.io/badge/Frontend_Deploy-Vercel-000000?logo=vercel)](https://local-grocery-shop.vercel.app)
+[![Deployment](https://img.shields.io/badge/Frontend_Deploy-Vercel-000000?logo=vercel)](https://local-grocery-shop-wheat.vercel.app)
 [![Deployment](https://img.shields.io/badge/Backend_Deploy-Render-46E3B7?logo=render)](https://grocery-shop-backend-2q5y.onrender.com)
 
 A full-stack, enterprise-grade **Local Grocery Shop Web Application** built with **React (Vite)**, **Node.js Express**, and **SQLite**. Features real-time inventory management, **PhonePe & UPI Bank Payment Verification**, **SMS & Email OTP Customer Verification**, real-time stock deduction, **Printable GST Invoice Receipts**, and **Store Analytics** in Indian Rupees (**₹**).
@@ -12,7 +12,8 @@ A full-stack, enterprise-grade **Local Grocery Shop Web Application** built with
 
 ## 🌐 Live Web Application & Repository Links
 
-- 🛒 **Live Customer Web Store**: **[https://local-grocery-shop.vercel.app](https://local-grocery-shop.vercel.app)**
+- 🛒 **Live Customer Web Store (Primary)**: **[https://local-grocery-shop-wheat.vercel.app](https://local-grocery-shop-wheat.vercel.app)**
+- 🛒 **Live Customer Web Store (Secondary)**: **[https://local-grocery-shop.vercel.app](https://local-grocery-shop.vercel.app)**
 - ⚙️ **Live Backend REST API**: **[https://grocery-shop-backend-2q5y.onrender.com](https://grocery-shop-backend-2q5y.onrender.com)**
 - 🐱 **GitHub Repository**: **[https://github.com/Revu-15/Local-Grocery-Shop-](https://github.com/Revu-15/Local-Grocery-Shop-)**
 
