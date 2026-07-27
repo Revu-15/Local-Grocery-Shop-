@@ -1,5 +1,12 @@
-const API_BASE = import.meta.env.VITE_API_BASE ||
-  (import.meta.env.DEV ? 'http://localhost:5000/api' : 'https://grocery-shop-backend-2q5y.onrender.com/api');
+const getApiBase = () => {
+  const envUrl = import.meta.env.VITE_API_BASE;
+  if (envUrl && typeof envUrl === 'string' && envUrl.startsWith('http')) {
+    return envUrl.endsWith('/') ? envUrl.slice(0, -1) : envUrl;
+  }
+  return import.meta.env.DEV ? 'http://localhost:5000/api' : 'https://grocery-shop-backend-2q5y.onrender.com/api';
+};
+
+export const API_BASE = getApiBase();
 
 export const fetchProducts = async (filters = {}, retries = 2) => {
   const params = new URLSearchParams();
